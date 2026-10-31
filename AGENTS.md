@@ -39,7 +39,7 @@ History: the original page lyrics are in `git show baa3098:docs/NNN.md`; the han
 - A repeated chorus is `{chorus: Припев}` between sections, not a copy of the lyrics. It becomes the repeat heading in the PDF and the verse order in OpenLP.
 - A blank line inside a section is a stanza break (an optional slide break in OpenLP).
 - Spoken or performance notes are `{comment: 2x}`, `{comment: само мъже}`.
-- Credits, shown under the title on the page, in the PDFs and in OpenLP: `{meta: original English title}`, `{artist: ...}` (original authors), `{lyricist: ...}`, `{composer: ...}`, `{meta: translator ...}`, `{copyright: ...}`, `{ccli: ...}`. Add them only from a reliable source; never guess. `{key: ...}` is optional.
+- Credits, shown under the title on the page, in the PDFs and in OpenLP: `{meta: original English title}`, `{artist: ...}` (original authors), `{lyricist: ...}`, `{composer: ...}`, `{meta: translator ...}`, `{copyright: ...}`, `{ccli: ...}`. Add them only from a reliable source; never guess. Do not use the author attributions on spodelenohvalenie.com (mostly wrong) unless they name an English original, and check that original. `{key: ...}` is optional.
 
 When the user asks to process songs, do it file-by-file unless they explicitly request batch regeneration. Do not overwrite already hand-corrected songs with automated output.
 If there is no chord source for a song, keep it lyric-only. Do not invent chords.
