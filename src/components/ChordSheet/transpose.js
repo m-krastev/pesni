@@ -28,14 +28,15 @@ export function noteNamesFor(firstChord, semitones) {
 }
 
 export function transposeChord(chord, semitones, names) {
+    if (semitones % 12 === 0) return chord;
     const parsed = parseChord(chord);
-    if (!parsed || semitones % 12 === 0) return chord;
+    if (!parsed) {
+        // A sequence on one syllable, written `D/Em` or `Em/D/C` on the old sheets.
+        const parts = chord.split('/');
+        return parts.length > 1 && parts.every(parseChord)
+            ? parts.map((part) => transposeChord(part, semitones, names)).join('/')
+            : chord;
+    }
     const bass = parsed.bass ? '/' + shiftNote(parsed.bass, semitones, names) : '';
     return shiftNote(parsed.root, semitones, names) + parsed.quality + bass;
-}
-
-// Transposes every chord-looking token in a bar line such as "||: F#m | D | A | E :||".
-export function transposeProgression(text, semitones, names) {
-    return text.replace(/[A-H][#b]?[^\s|:/]*(?:\/[A-H][#b]?)?/g, (token) =>
-        transposeChord(token, semitones, names));
 }

@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
-import {noteNamesFor, transposeChord, transposeProgression} from './transpose';
+import {noteNamesFor, transposeChord} from './transpose';
 
 const SHOW_KEY = 'showChords';
 const transposeKey = (id) => `transpose:${id}`;
@@ -87,7 +87,8 @@ function LyricLine({segments, renderChord}) {
     );
 }
 
-const isChordOnly = (line) => line.progression || line.every(([, text]) => !text.trim());
+// Chord rows (an intro, `||: [F#m] | [D] :||`) carry no lyrics and are hidden without chords.
+const isChordOnly = (line) => Array.isArray(line) && /^[\s|:.]*$/.test(line.map(([, text]) => text).join(''));
 
 // The whole song page: lyrics always (rendered on the server, so search and
 // no-JS readers get them), chords and transposition when switched on.
@@ -156,12 +157,8 @@ export default function ChordSheet({song}) {
                             if (line === null) {
                                 return i > 0 && lines[i - 1] !== null ? <div key={i} className={styles.stanzaBreak} /> : null;
                             }
-                            if (line.progression) {
-                                return (
-                                    <div key={i} className={styles.progression}>
-                                        {transposeProgression(line.progression, semitones, names)}
-                                    </div>
-                                );
+                            if (line.comment) {
+                                return <div key={i} className={styles.comment}>({line.comment})</div>;
                             }
                             return <LyricLine key={i} segments={line} renderChord={renderChord} />;
                         })}

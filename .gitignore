@@ -20,3 +20,8 @@ yarn-debug.log*
 yarn-error.log*
 
 archive
+# Generated from songs/*.cho by scripts/build-songs.mjs (npm run songs)
+/docs/
+/src/data/songs/
+/typ/generated/
+/static/openlp/
