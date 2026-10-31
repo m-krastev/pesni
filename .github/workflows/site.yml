@@ -54,18 +54,27 @@ jobs:
     runs-on: ubuntu-24.04
     environment: production
     steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts/deploy.sh
+          sparse-checkout-cone-mode: false
+
       - uses: actions/download-artifact@v8
         with:
           name: site
           path: build
 
+      # The build that was deployed last time, so only changed files are uploaded.
+      - uses: actions/cache/restore@v6
+        with:
+          path: .deployed
+          key: deployed-${{ github.run_id }}
+          restore-keys: deployed-
+
       - name: Install rclone
         run: curl -fsSL https://rclone.org/install.sh | sudo bash
 
-      # Copy only: files on the server that are not in the build (.htaccess,
-      # .well-known/, older PDFs) are kept. Low concurrency, the FTP server
-      # drops TLS handshakes otherwise.
-      - name: Upload
+      - name: Upload changed files
         env:
           RCLONE_CONFIG_PROPOVEDI_TYPE: ftp
           RCLONE_CONFIG_PROPOVEDI_HOST: ftp.propovedi.org
@@ -73,8 +82,9 @@ jobs:
           RCLONE_CONFIG_PROPOVEDI_PASS: ${{ secrets.FTP_PASS_OBSCURED }}
           RCLONE_CONFIG_PROPOVEDI_EXPLICIT_TLS: "true"
           RCLONE_CONFIG_PROPOVEDI_NO_CHECK_CERTIFICATE: "true"
-        run: >
-          rclone copy build propovedi:pesni.propovedi.org
-          --exclude "chord-thumbnails/**"
-          --transfers 2 --checkers 2 --ftp-concurrency 4
-          --stats-one-line --stats 60s
+        run: bash scripts/deploy.sh
+
+      - uses: actions/cache/save@v6
+        with:
+          path: .deployed
+          key: deployed-${{ github.run_id }}

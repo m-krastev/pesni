@@ -3,7 +3,7 @@
 #import "style.typ": songbook
 #import sys.inputs.song: lyrics
 
-#set document(title: "Текст")
+#set document(title: "Текст", date: none)
 #show: songbook
 #set text(size: 20pt)
 
