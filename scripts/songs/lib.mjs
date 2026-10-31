@@ -13,7 +13,9 @@ const BARS_ONLY = /^[\s|:.]*$/;
 export class SongError extends Error {}
 
 // A chord, or a sequence on one syllable written the way the old sheets do: `D/Em`, `Em/D/C`.
-export const isChord = (name) => Boolean(Chord.parse(name)) || name.split('/').every((part) => Chord.parse(part));
+// German `H` is not accepted: the songbook writes B.
+export const isChord = (name) => !/(^|\/)H/.test(name)
+    && (Boolean(Chord.parse(name)) || name.split('/').every((part) => Chord.parse(part)));
 
 // Chord rows (intros, `||: [F#m] | [D] :||`) carry no lyrics.
 export const isChordOnly = (line) => Array.isArray(line) && line.some(([chord]) => chord)

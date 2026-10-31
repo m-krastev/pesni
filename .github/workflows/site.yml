@@ -1,0 +1,80 @@
+name: Site
+
+# Every push and pull request: run the tests and build the site (songs, PDFs, pages).
+# Pushes to main also deploy the build to pesni.propovedi.org over FTPS.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TYPST_VERSION: 0.15.1
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install Typst
+        run: |
+          curl -fsSL "https://github.com/typst/typst/releases/download/v${TYPST_VERSION}/typst-x86_64-unknown-linux-musl.tar.xz" \
+            | tar -xJ --strip-components=1 -C /usr/local/bin typst-x86_64-unknown-linux-musl/typst
+          typst --version
+
+      - name: Cache Typst packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/typst
+          key: typst-packages-${{ hashFiles('typ/style.typ') }}
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        with:
+          name: site
+          path: build
+          retention-days: 7
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: build
+
+      - name: Install rclone
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
+
+      # Copy only: files on the server that are not in the build (.htaccess,
+      # .well-known/, older PDFs) are kept. Low concurrency, the FTP server
+      # drops TLS handshakes otherwise.
+      - name: Upload
+        env:
+          RCLONE_CONFIG_PROPOVEDI_TYPE: ftp
+          RCLONE_CONFIG_PROPOVEDI_HOST: ftp.propovedi.org
+          RCLONE_CONFIG_PROPOVEDI_USER: ${{ secrets.FTP_USER }}
+          RCLONE_CONFIG_PROPOVEDI_PASS: ${{ secrets.FTP_PASS_OBSCURED }}
+          RCLONE_CONFIG_PROPOVEDI_EXPLICIT_TLS: "true"
+          RCLONE_CONFIG_PROPOVEDI_NO_CHECK_CERTIFICATE: "true"
+        run: >
+          rclone copy build propovedi:pesni.propovedi.org
+          --exclude "chord-thumbnails/**"
+          --transfers 2 --checkers 2 --ftp-concurrency 4
+          --stats-one-line --stats 60s
