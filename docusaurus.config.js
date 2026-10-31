@@ -1,10 +1,10 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const {themes} = require('prism-react-renderer');
+const lightCodeTheme = themes.github;
+const darkCodeTheme = themes.dracula;
 
-const customPlugin = require('./src/remark/my_plugin')
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -13,7 +13,9 @@ const config = {
     url: 'https://pesni.propovedi.org',
     baseUrl: '/',
     onBrokenLinks: 'throw',
-    onBrokenMarkdownLinks: 'warn',
+    markdown: {
+        hooks: {onBrokenMarkdownLinks: 'warn'},
+    },
     favicon: 'img/logo_propovedi.png',
 
     // GitHub pages deployment config.
@@ -90,7 +92,7 @@ const config = {
                         position: 'right',
                     },
                     {
-                        href: 'https://github.com/Rinto-kun/pesni',
+                        href: 'https://github.com/m-krastev/pesni',
                         position: 'right',
                         className: 'header-github-link',
                         'aria-label': 'GitHub repository',
