@@ -7,14 +7,14 @@ Convert Bulgarian worship chord sheets from screenshots, pasted text, PDFs, or r
 `songs/NNN-slug.cho` (ChordPro) is the single source of truth for every song. `scripts/build-songs.mjs` generates everything else from it:
 
 - `docs/NNN.md` and `src/data/songs/NNN.json`: the website page and its data,
-- `typ/generated/*.typ`: conchord modules, rendered with `typ/single.typ` (and `typ/style.typ`) into the chord PDFs in `static/chords/`,
+- `typ/generated/*.typ`: Typst modules, rendered with `typ/single.typ` into the chord PDFs in `static/chords/` and with `typ/lyrics.typ` into the lyrics PDFs in `static/pdf/` (shared look in `typ/style.typ`),
 - `static/openlp/*.xml` and `static/openlp/pesni-openlp.zip`: OpenLyrics files for OpenLP.
 
 The build runs automatically before `npm run build` and `npm start`; run `npm run songs` by hand after editing. Generated files are git-ignored: never edit them. The build stops with an error on unknown directives, unknown chords, or unclosed sections.
 
 The full songbook PDF is `typst compile --root . typ/all.typ songbook.pdf` (after `npm run songs`).
 
-History: the original page lyrics are in `git show baa3098:docs/NNN.md`; the hand-corrected Typst versions the .cho files were converted from are in `git show 669fd3a:typ/songs/`. The original chord PDFs are in git history of `static/chords` and in `static/chord-thumbnails/`. `songs/MISSING-CHORDS.md` lists songs that still have no chords.
+History: the original page lyrics are in `git show baa3098:docs/NNN.md`; the hand-corrected Typst versions the .cho files were converted from are in `git show 669fd3a:typ/songs/`. The original chord and lyrics files (PDF, DOC, DOCX) are archived unchanged in `static/old_chords/` and `static/old_pdf/`; `static/chord-thumbnails/` has rendered pages of the original chord PDFs. `songs/MISSING-CHORDS.md` lists songs that still have no chords.
 
 ## Song format
 
@@ -39,7 +39,7 @@ History: the original page lyrics are in `git show baa3098:docs/NNN.md`; the han
 - A repeated chorus is `{chorus: Припев}` between sections, not a copy of the lyrics. It becomes the repeat heading in the PDF and the verse order in OpenLP.
 - A blank line inside a section is a stanza break (an optional slide break in OpenLP).
 - Spoken or performance notes are `{comment: 2x}`, `{comment: само мъже}`.
-- Optional metadata: `{artist: ...}`, `{lyricist: ...}`, `{composer: ...}`, `{key: ...}`, `{copyright: ...}`.
+- Credits, shown under the title on the page, in the PDFs and in OpenLP: `{meta: original English title}`, `{artist: ...}` (original authors), `{lyricist: ...}`, `{composer: ...}`, `{meta: translator ...}`, `{copyright: ...}`, `{ccli: ...}`. Add them only from a reliable source; never guess. `{key: ...}` is optional.
 
 When the user asks to process songs, do it file-by-file unless they explicitly request batch regeneration. Do not overwrite already hand-corrected songs with automated output.
 If there is no chord source for a song, keep it lyric-only. Do not invent chords.

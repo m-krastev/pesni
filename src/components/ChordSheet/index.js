@@ -117,6 +117,7 @@ export default function ChordSheet({song}) {
 
     return (
         <div className={styles.chordSheet}>
+            {song.credits && <div className={styles.credits}>{song.credits}</div>}
             {firstChord && (
                 <div className={styles.toolbar}>
                     <button
@@ -165,6 +166,7 @@ export default function ChordSheet({song}) {
                     </section>
                 );
             })}
+            {song.copyright && <div className={styles.credits}>{song.copyright}</div>}
         </div>
     );
 }

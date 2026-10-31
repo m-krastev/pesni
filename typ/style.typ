@@ -1,7 +1,13 @@
-// Shared look of the printed chord sheets (typ/single.typ, typ/all.typ).
+// Shared look of the printed sheets: typ/single.typ (chords), typ/lyrics.typ, typ/all.typ.
 #import "@preview/conchord:0.4.0": chordify, overchord
 
 #let och = overchord.with(styling: it => text(it, fill: maroon, weight: "bold"))
+
+// Credits and copyright under the title / at the end of a song.
+#let song-info(body) = block(above: 0.6em, below: 1em, text(size: 10pt, weight: "regular", style: "italic", fill: luma(90), body))
+
+// Choruses are indented in the lyrics sheets.
+#let chorus(body) = pad(left: 2em, body)
 
 #let songbook(body) = {
   set page(paper: "a4", margin: 3em)

@@ -2,6 +2,13 @@
     margin-bottom: 1rem;
 }
 
+.credits {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--ifm-color-emphasis-700);
+    margin-bottom: 1rem;
+}
+
 .toolbar {
     display: flex;
     flex-wrap: wrap;

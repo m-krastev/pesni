@@ -6,7 +6,7 @@
 #set document(title: "Песни")
 #show: songbook
 
-#for (i, song) in songs.enumerate() {
+#for (i, s) in songs.enumerate() {
   if i > 0 { pagebreak() }
-  song
+  s.song
 }

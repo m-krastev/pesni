@@ -19,14 +19,3 @@ export function DownloadChordsButton({ pdf }) {
         </div>
     );
 }
-
-export function DownloadOpenLPButton({ xml }) {
-    return (
-        <div className={styles.downloadsbutton}>
-            <a href={xml} download className="button button--secondary button--lg"
-                title="OpenLyrics файл за внасяне в OpenLP">
-                💻 OpenLP
-            </a>
-        </div>
-    );
-}

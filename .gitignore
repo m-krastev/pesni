@@ -25,3 +25,5 @@ archive
 /src/data/songs/
 /typ/generated/
 /static/openlp/
+/static/pdf/
+/static/chords/
