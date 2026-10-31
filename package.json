@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
+    "songs": "python3 scripts/build_songs.py",
+    "prestart": "npm run songs",
     "start": "docusaurus start",
+    "prebuild": "npm run songs",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",

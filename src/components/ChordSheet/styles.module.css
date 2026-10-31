@@ -1,0 +1,75 @@
+.chordSheet {
+    margin-bottom: 1rem;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.transpose {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.key {
+    min-width: 4.5rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.section {
+    margin-bottom: 1.2em;
+}
+
+.chorus {
+    padding-left: var(--ifm-spacing-horizontal);
+}
+
+.sectionTitle {
+    font-size: 0.6em;
+    font-weight: bold;
+    color: var(--ifm-color-emphasis-600);
+    margin-bottom: 0.2em;
+}
+
+.line {
+    margin-bottom: 0.15em;
+}
+
+.word {
+    white-space: nowrap;
+}
+
+.plainLine {
+    white-space: pre-wrap;
+}
+
+.anchor {
+    display: inline-block;
+}
+
+.chord {
+    font-size: 0.75em;
+    font-weight: bold;
+    color: var(--ifm-color-primary);
+    display: block;
+    padding-right: 0.4em;
+}
+
+.progression {
+    font-weight: bold;
+    color: var(--ifm-color-primary);
+    font-size: 0.8em;
+    margin-bottom: 0.4em;
+    white-space: pre-wrap;
+}
+
+.stanzaBreak {
+    height: 1em;
+}
