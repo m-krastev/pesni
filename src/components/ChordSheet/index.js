@@ -33,6 +33,9 @@ function firstChordOf(song) {
     return null;
 }
 
+// Chord rows (an intro, `||: [F#m] | [D] :||`) carry no lyrics and are hidden without chords.
+const isChordOnly = (line) => Array.isArray(line) && /^[\s|:.]*$/.test(line.map(([, text]) => text).join(''));
+
 // Groups a line into words: each word keeps the chords that sit inside or at the
 // start of it, so the browser can wrap between words without a chord drifting
 // away from its syllable.
@@ -68,6 +71,19 @@ function wordsOf(segments) {
 }
 
 function LyricLine({segments, renderChord}) {
+    if (renderChord && isChordOnly(segments)) {
+        // An intro or interlude: just the chords (and bar lines), no empty lyric row under them.
+        return (
+            <div className={styles.chordRow}>
+                {segments.map(([chord, text], i) => (
+                    <React.Fragment key={i}>
+                        {chord && <span className={styles.chord}>{renderChord(chord)}</span>}
+                        {text.trim() && <span className={styles.bars}>{text.trim()}</span>}
+                    </React.Fragment>
+                ))}
+            </div>
+        );
+    }
     if (!renderChord || !segments.some(([chord]) => chord)) {
         return <div className={styles.plainLine}>{segments.map(([, text]) => text).join('')}</div>;
     }
@@ -87,8 +103,24 @@ function LyricLine({segments, renderChord}) {
     );
 }
 
-// Chord rows (an intro, `||: [F#m] | [D] :||`) carry no lyrics and are hidden without chords.
-const isChordOnly = (line) => Array.isArray(line) && /^[\s|:.]*$/.test(line.map(([, text]) => text).join(''));
+const isChorus = (section) => section.kind === 'chorus' || /^припев/i.test(section.title);
+
+// What the left margin shows for a section: the verse number, nothing for a
+// chorus (it gets a bar instead), or the section's name (Интро, Мост, Край).
+function sectionMarker(section) {
+    if (isChorus(section)) return '';
+    const verse = /^куплет\s*(\d+)/i.exec(section.title);
+    if (verse) return verse[1];
+    return section.title;
+}
+
+// First lyric line of the section with this title, shown where it is repeated.
+function firstLineOf(song, title) {
+    const source = song.sections.find((s) => s.title === title && !s.repeat);
+    const line = source && source.lines.find((l) => Array.isArray(l) && !isChordOnly(l));
+    return line ? line.map(([, text]) => text).join('').replace(/\s+/g, ' ').replace(/[\s,.;:!?–-]+$/, '').trim() : '';
+}
+
 
 // The whole song page: lyrics always (rendered on the server, so search and
 // no-JS readers get them), chords and transposition when switched on.
@@ -148,21 +180,36 @@ export default function ChordSheet({song}) {
             )}
             {song.sections.map((section, s) => {
                 const lines = chordsOn ? section.lines : section.lines.filter((line) => line === null || !isChordOnly(line));
-                // Sections with only chords (an intro) disappear without chords;
-                // a heading with no lines at all is a repeat marker and stays.
+                // Sections with only chords (an intro) disappear without chords.
                 if (section.lines.length && !lines.some((line) => line !== null)) return null;
+                const chorus = isChorus(section);
+                const marker = sectionMarker(section);
                 return (
-                    <section key={s} className={clsx(styles.section, /^припев/i.test(section.title) && styles.chorus)}>
-                        {section.title && <div className={clsx(styles.sectionTitle, 'chordsheet-label')}>{section.title}</div>}
-                        {lines.map((line, i) => {
-                            if (line === null) {
-                                return i > 0 && lines[i - 1] !== null ? <div key={i} className={styles.stanzaBreak} /> : null;
-                            }
-                            if (line.comment) {
-                                return <div key={i} className={styles.comment}>({line.comment})</div>;
-                            }
-                            return <LyricLine key={i} segments={line} renderChord={renderChord} />;
-                        })}
+                    <section
+                        key={s}
+                        aria-label={section.title || undefined}
+                        className={clsx(styles.section, chorus && styles.chorus, chordsOn && styles.withChords)}>
+                        <div
+                            className={clsx(styles.marker, marker.length > 2 && styles.markerLong, 'chordsheet-label')}
+                            title={section.title || undefined}
+                            aria-hidden="true">
+                            {marker}
+                        </div>
+                        <div className={styles.body}>
+                            {section.repeat ? (
+                                <div className={clsx(styles.repeat, 'chordsheet-label')} title={`Повтаря се: ${section.title}`}>
+                                    ↻ {firstLineOf(song, section.title) || section.title}…
+                                </div>
+                            ) : lines.map((line, i) => {
+                                if (line === null) {
+                                    return i > 0 && lines[i - 1] !== null ? <div key={i} className={styles.stanzaBreak} /> : null;
+                                }
+                                if (line.comment) {
+                                    return <div key={i} className={styles.comment}>({line.comment})</div>;
+                                }
+                                return <LyricLine key={i} segments={line} renderChord={renderChord} />;
+                            })}
+                        </div>
                     </section>
                 );
             })}
