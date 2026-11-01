@@ -1,33 +1,88 @@
 .chordSheet {
+    position: relative;
     margin-bottom: 1rem;
 }
 
 .credits {
-    font-size: 0.8rem;
-    font-style: italic;
-    color: var(--ifm-color-emphasis-700);
-    margin-bottom: 1rem;
+    font-family: var(--ifm-font-family-base);
+    font-size: 0.85rem;
+    color: var(--site-muted);
+    margin: 0 0 1.5rem;
 }
 
-.toolbar {
+/* Diagrams of every chord in the song, above the lyrics. */
+.diagrams {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     gap: 0.5rem;
-    font-size: 1rem;
-    margin-bottom: 1rem;
+    margin: 0 0 1.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--site-border);
+    border-radius: var(--ifm-global-radius);
+    background: var(--site-surface);
 }
 
-.transpose {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
+/* The diagram of the chord under the pointer. */
+.popover {
+    position: absolute;
+    z-index: 20;
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.4rem;
+    border: 1px solid var(--site-border);
+    border-radius: var(--ifm-global-radius);
+    background: var(--site-surface);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    pointer-events: none;
 }
 
-.key {
-    min-width: 4.5rem;
+.diagram {
+    margin: 0;
+    width: 4.5rem;
     text-align: center;
-    font-weight: bold;
+    font-family: var(--ifm-font-family-base);
+}
+
+.diagram svg {
+    width: 100%;
+    display: block;
+}
+
+.diagramName {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--song-chord);
+}
+
+.diagramLine {
+    stroke: var(--site-muted);
+    stroke-width: 0.8;
+}
+
+.diagramNut {
+    fill: var(--ifm-font-color-base);
+}
+
+.diagramDot {
+    fill: var(--ifm-font-color-base);
+}
+
+.diagramOpen {
+    fill: none;
+    stroke: var(--ifm-font-color-base);
+    stroke-width: 0.9;
+}
+
+.diagramMark,
+.diagramFret {
+    font-size: 7px;
+    fill: var(--site-muted);
+}
+
+.diagramMissing {
+    font-size: 0.7rem;
+    color: var(--site-muted);
+    padding: 1.5rem 0;
 }
 
 /* Each section: a narrow margin with its marker, then the lines. */
@@ -71,7 +126,7 @@
 }
 
 .chorus .body {
-    border-left: 3px solid var(--ifm-color-primary-lighter);
+    border-left: 2px solid var(--song-chord);
     padding-left: 0.9rem;
 }
 
@@ -130,11 +185,20 @@
 }
 
 .chord {
-    font-size: 0.75em;
-    font-weight: bold;
-    color: var(--ifm-color-primary);
+    font-family: var(--ifm-font-family-base);
+    font-size: 0.68em;
+    font-weight: 600;
+    color: var(--song-chord);
     display: block;
     padding-right: 0.4em;
+    cursor: default;
+    outline: none;
+}
+
+.chord:hover,
+.chord:focus-visible {
+    text-decoration: underline dotted;
+    text-underline-offset: 0.2em;
 }
 
 .comment {

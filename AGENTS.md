@@ -4,7 +4,7 @@
 Convert Bulgarian worship chord sheets from screenshots, pasted text, PDFs, or rough chord-over-lyric layouts into clean ChordPro files.
 
 ## Where songs live
-`songs/NNN-slug.cho` (ChordPro) is the single source of truth for every song. `scripts/build-songs.mjs` generates everything else from it:
+`songs/NNN-slug.cho` (ChordPro) is the single source of truth for every song in Песни; the other songbooks (tabs on the site) are folders in `books/` with the same format, listed in `scripts/songs/books.mjs`. `scripts/build-songs.mjs` generates everything else from it:
 
 - `docs/NNN.md` and `src/data/songs/NNN.json`: the website page and its data,
 - `typ/generated/*.typ`: Typst modules, rendered with `typ/single.typ` into the chord PDFs in `static/chords/` and with `typ/lyrics.typ` into the lyrics PDFs in `static/pdf/` (shared look in `typ/style.typ`),

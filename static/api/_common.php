@@ -60,11 +60,21 @@ function db(): PDO
 /** The song's source as the site has it now (build copies songs/*.cho to /cho/), or null. */
 function currentSource(string $file): ?string
 {
-    if (!preg_match('/^\d{3}-[a-z0-9-]+\.cho$/', $file)) {
+    if (!preg_match('~^(?:[a-z]+/)?\d{3}-[a-z0-9-]+\.cho$~', $file)) {
         return null;
     }
     $path = SONG_SOURCES . '/' . $file;
     return is_file($path) ? (string) file_get_contents($path) : null;
+}
+
+/** The song's page on the site: songs at the root are /NNN/, other books /<route>/N/ (static/cho/books.json). */
+function songUrl(string $file): string
+{
+    $book = strpos($file, '/') !== false ? strstr($file, '/', true) : '';
+    $routes = json_decode((string) @file_get_contents(SONG_SOURCES . '/books.json'), true) ?: [];
+    $number = substr(basename($file), 0, 3);
+    $route = $routes[$book] ?? '';
+    return $route === '' ? "/$number/" : "/$route/" . (int) $number . '/';
 }
 
 function h(string $text): string

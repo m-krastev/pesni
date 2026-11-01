@@ -1,0 +1,146 @@
+/**
+ * Color palettes, chosen in the navbar's palette menu (src/components/PaletteMenu): the
+ * choice sits on <html data-palette="..."> (set before the page paints, see the
+ * load-font-settings plugin in docusaurus.config.js). Without it the site uses the blue
+ * palette of custom.css. Each palette has a light and a dark variant.
+ */
+
+html[data-palette='green'][data-theme='light'] {
+    --ifm-color-primary: #2e7d4f;
+    --ifm-color-primary-dark: #297047;
+    --ifm-color-primary-darker: #276a43;
+    --ifm-color-primary-darkest: #205737;
+    --ifm-color-primary-light: #37965f;
+    --ifm-color-primary-lighter: #3ca266;
+    --ifm-color-primary-lightest: #52bf7f;
+    --ifm-menu-color-background-active: rgba(46, 125, 79, 0.1);
+    --ifm-menu-color-background-hover: rgba(46, 125, 79, 0.06);
+    --song-chord: #b0412e;
+}
+
+html[data-palette='green'][data-theme='dark'] {
+    --ifm-color-primary: #62cc96;
+    --ifm-color-primary-dark: #4bc587;
+    --ifm-color-primary-darker: #40c17f;
+    --ifm-color-primary-darkest: #34a069;
+    --ifm-color-primary-light: #72d1a0;
+    --ifm-color-primary-lighter: #7ad4a6;
+    --ifm-color-primary-lightest: #91dbb5;
+    --ifm-menu-color-background-active: rgba(98, 204, 150, 0.14);
+    --ifm-menu-color-background-hover: rgba(98, 204, 150, 0.08);
+    --song-chord: #f09a84;
+}
+
+html[data-palette='burgundy'][data-theme='light'] {
+    --ifm-color-primary: #8a2a3b;
+    --ifm-color-primary-dark: #7c2635;
+    --ifm-color-primary-darker: #752432;
+    --ifm-color-primary-darkest: #611d29;
+    --ifm-color-primary-light: #a33246;
+    --ifm-color-primary-lighter: #b0364b;
+    --ifm-color-primary-lightest: #c94e64;
+    --ifm-menu-color-background-active: rgba(138, 42, 59, 0.1);
+    --ifm-menu-color-background-hover: rgba(138, 42, 59, 0.06);
+    --song-chord: #1f5f8b;
+}
+
+html[data-palette='burgundy'][data-theme='dark'] {
+    --ifm-color-primary: #e59aa8;
+    --ifm-color-primary-dark: #dd7c8e;
+    --ifm-color-primary-darker: #d96c81;
+    --ifm-color-primary-darkest: #cd3f59;
+    --ifm-color-primary-light: #e8a4b1;
+    --ifm-color-primary-lighter: #e9a9b5;
+    --ifm-color-primary-lightest: #edb8c2;
+    --ifm-menu-color-background-active: rgba(229, 154, 168, 0.14);
+    --ifm-menu-color-background-hover: rgba(229, 154, 168, 0.08);
+    --song-chord: #8fc2ea;
+}
+
+html[data-palette='sepia'][data-theme='light'] {
+    --ifm-color-primary: #8a5a2b;
+    --ifm-color-primary-dark: #7c5127;
+    --ifm-color-primary-darker: #754d25;
+    --ifm-color-primary-darkest: #613f1e;
+    --ifm-color-primary-light: #a36a33;
+    --ifm-color-primary-lighter: #b07337;
+    --ifm-color-primary-lightest: #c88b4f;
+    --ifm-menu-color-background-active: rgba(138, 90, 43, 0.1);
+    --ifm-menu-color-background-hover: rgba(138, 90, 43, 0.06);
+    --song-chord: #a33a1f;
+    --ifm-background-color: #f5eedf;
+    --ifm-background-surface-color: #f5eedf;
+    --ifm-navbar-background-color: rgb(245, 238, 223);
+    --site-surface: #fbf6ec;
+    --site-border: #e3d8c3;
+    --ifm-font-color-base: #3b2f22;
+    --ifm-navbar-link-color: #3b2f22;
+    --ifm-menu-color: #3b2f22;
+    --site-muted: #7a6a55;
+}
+
+html[data-palette='sepia'][data-theme='dark'] {
+    --ifm-color-primary: #d9a86c;
+    --ifm-color-primary-dark: #d29952;
+    --ifm-color-primary-darker: #cf9145;
+    --ifm-color-primary-darkest: #b5792f;
+    --ifm-color-primary-light: #ddb17b;
+    --ifm-color-primary-lighter: #dfb582;
+    --ifm-color-primary-lightest: #e4c298;
+    --ifm-menu-color-background-active: rgba(217, 168, 108, 0.14);
+    --ifm-menu-color-background-hover: rgba(217, 168, 108, 0.08);
+    --song-chord: #f0a07a;
+    --ifm-background-color: #1d1914;
+    --ifm-background-surface-color: #1d1914;
+    --ifm-navbar-background-color: rgb(29, 25, 20);
+    --site-surface: #26211a;
+    --site-border: #3a3227;
+    --ifm-font-color-base: #eadfcd;
+    --ifm-navbar-link-color: #eadfcd;
+    --ifm-menu-color: #eadfcd;
+    --site-muted: #a8998a;
+}
+
+html[data-palette='contrast'][data-theme='light'] {
+    --ifm-color-primary: #0037a5;
+    --ifm-color-primary-dark: #003194;
+    --ifm-color-primary-darker: #002f8c;
+    --ifm-color-primary-darkest: #002674;
+    --ifm-color-primary-light: #0042c8;
+    --ifm-color-primary-lighter: #0048d9;
+    --ifm-color-primary-lightest: #0e5eff;
+    --ifm-menu-color-background-active: rgba(0, 55, 165, 0.1);
+    --ifm-menu-color-background-hover: rgba(0, 55, 165, 0.06);
+    --song-chord: #c00000;
+    --ifm-background-color: #ffffff;
+    --ifm-background-surface-color: #ffffff;
+    --ifm-navbar-background-color: rgb(255, 255, 255);
+    --site-surface: #ffffff;
+    --site-border: #8a8a8a;
+    --ifm-font-color-base: #000000;
+    --ifm-navbar-link-color: #000000;
+    --ifm-menu-color: #000000;
+    --site-muted: #333333;
+}
+
+html[data-palette='contrast'][data-theme='dark'] {
+    --ifm-color-primary: #9fc3ff;
+    --ifm-color-primary-dark: #76a9ff;
+    --ifm-color-primary-darker: #619cff;
+    --ifm-color-primary-darkest: #2375ff;
+    --ifm-color-primary-light: #a9c9ff;
+    --ifm-color-primary-lighter: #adccff;
+    --ifm-color-primary-lightest: #bcd5ff;
+    --ifm-menu-color-background-active: rgba(159, 195, 255, 0.14);
+    --ifm-menu-color-background-hover: rgba(159, 195, 255, 0.08);
+    --song-chord: #ff8c8c;
+    --ifm-background-color: #000000;
+    --ifm-background-surface-color: #000000;
+    --ifm-navbar-background-color: rgb(0, 0, 0);
+    --site-surface: #0d0d0d;
+    --site-border: #777777;
+    --ifm-font-color-base: #ffffff;
+    --ifm-navbar-link-color: #ffffff;
+    --ifm-menu-color: #ffffff;
+    --site-muted: #dddddd;
+}

@@ -16,6 +16,38 @@ On a song page you can show or hide the chords and transpose them; the choice is
 Short links by number lead to a song's page and files: `/52`, `/pdf/52`, `/chords/52`. Typing a number in
 the search box finds that song.
 
+## Songbooks
+
+The site has one tab per songbook, listed in [`scripts/songs/books.mjs`](scripts/songs/books.mjs):
+
+| Tab | Songs | Address |
+|-----|-------|---------|
+| Песни | `songs/` | `/052/` |
+| Рождество | `books/rozhdestvo/` (the originals are kept in `static/pesni-rozhdestvo/`) | `/pesni-rozhdestvo/1/` |
+| Песнарка | `books/pesnarka/` (imported once from the old hymnal site with `scripts/import_pesnarka.py`) | `/pesnarka/313/` |
+| Нови | `books/new/` (imported once from spodelenohvalenie.com with `scripts/import_spodeleno.py`) | `/new/52/` |
+
+Each book is its own Docusaurus docs instance with a generated sidebar and its own search index: the search box
+searches the book you are in (from Песни it searches every book), and the search page can switch between them.
+Песни keeps the paths it always had; the other books get theirs under their address (`/pesni-rozhdestvo/pdf/...`,
+`static/openlp/rozhdestvo/`, `rozhdestvo-openlp.zip`). A new book is a folder of `.cho` files and an entry in
+`books.mjs`.
+
+Песнарка's hymns carry their hymnal reference, Bible reference and recordings as metadata
+(`{meta: reference ...}`, `{meta: scripture ...}`, `{meta: melody|unison|score URL}`); the recordings and scores
+are on hopeforthebalkans.org. Chords (from "Духовни песни" with chords) are over the first verse of 249 hymns.
+The old address propovedi.org/pesnarka/ redirects here with
+[`scripts/redirects/pesnarka.htaccess`](scripts/redirects/pesnarka.htaccess), copied by hand to
+`public_html/pesnarka/.htaccess` on the server.
+
+Нови has the spodelenohvalenie.com songs that are not already in Песни or Песнарка, numbered in the order the site
+lists them (the scrape in `spodeleno/`, made with `scripts/scrape_spodeleno.py`). Each page links to its source
+(`{meta: source ...}`) and video (`{meta: youtube ...}`). The site's author credits are mostly wrong, so they are kept
+only as `#` notes. Chords come from the site's chord progressions and chord files.
+
+`static/.htaccess` replaces the site's `.htaccess` on the server: it keeps cPanel's lines and turns on
+compression (the search index of all books is 5 MB of JSON, about 1 MB compressed).
+
 ## Editing a song
 
 A song looks like this:
@@ -125,11 +157,15 @@ plus a hidden field that bots fill in.
 | Path | Contents |
 |------|----------|
 | `songs/` | the songs (ChordPro), the source of truth |
+| `books/` | the other songbooks, one folder each |
 | `scripts/build-songs.mjs`, `scripts/songs/` | the song build and its tests |
 | `typ/` | Typst templates for the printed sheets (`style.typ` holds the look) |
-| `src/components/ChordSheet/` | the song view: lyrics, chords, transposition |
+| `src/components/ChordSheet/` | the song view: lyrics, chords, transposition, chord diagrams (shapes from `@tombatossals/chords-db`) |
+| `src/theme/DocBreadcrumbs/` | the song's menus beside the breadcrumbs: chords (on/off, key, diagrams) and text size |
+| `src/pages/index.js`, `src/css/`, `src/components/PaletteMenu/` | the home page, the look (Inter, colors) and the palettes of the navbar's color menu |
 | `src/components/SuggestEdit/`, `static/api/` | the correction editor and its PHP backend |
 | `static/old_chords/`, `static/old_pdf/` | the original chord and lyrics files, kept unchanged |
 
-`docs/`, `src/data/songs/`, `typ/generated/`, `static/pdf/`, `static/chords/`, `static/cho/` and `static/openlp/` are generated
+`docs/`, `docs-*/`, `src/data/songs/`, `src/data/<book>/`, `src/data/sidebars/`, `typ/generated/`, `static/pdf/`,
+`static/chords/`, `static/<book address>/pdf/` and `chords/`, `static/cho/` and `static/openlp/` are generated
 and not tracked in git.

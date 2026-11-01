@@ -1,27 +1,10 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
 import {noteNamesFor, transposeChord} from './transpose';
-
-const SHOW_KEY = 'showChords';
-const transposeKey = (id) => `transpose:${id}`;
-
-function readStorage(key) {
-    try {
-        return window.localStorage.getItem(key);
-    } catch (e) {
-        return null;
-    }
-}
-
-function writeStorage(key, value) {
-    try {
-        if (value === null) window.localStorage.removeItem(key);
-        else window.localStorage.setItem(key, value);
-    } catch (e) {
-        // Storage can be unavailable (private mode); the controls still work for this page.
-    }
-}
+import {registerSong, useChordState} from './store';
+import {chordsIn, loadShapes, shapeOf, shapesLoaded} from './shapes';
+import ChordDiagram from './ChordDiagram';
 
 function firstChordOf(song) {
     for (const section of song.sections) {
@@ -34,7 +17,9 @@ function firstChordOf(song) {
 }
 
 // Chord rows (an intro, `||: [F#m] | [D] :||`) carry no lyrics and are hidden without chords.
-const isChordOnly = (line) => Array.isArray(line) && /^[\s|:.]*$/.test(line.map(([, text]) => text).join(''));
+// (The same rule as BARS_ONLY in scripts/songs/lib.mjs.)
+const BARS_ONLY = /^(?:[\s|:./%()]|[xх×]\s*\d+|\d+\s*[xх×])*$/iu;
+const isChordOnly = (line) => Array.isArray(line) && BARS_ONLY.test(line.map(([, text]) => text).join(''));
 
 // Groups a line into words: each word keeps the chords that sit inside or at the
 // start of it, so the browser can wrap between words without a chord drifting
@@ -70,6 +55,11 @@ function wordsOf(segments) {
     return words;
 }
 
+// A chord name in the lyrics: hovering, focusing or tapping it shows its diagram.
+function Chord({name}) {
+    return <span className={styles.chord} data-chord={name} tabIndex={0}>{name}</span>;
+}
+
 function LyricLine({segments, renderChord}) {
     if (renderChord && isChordOnly(segments)) {
         // An intro or interlude: just the chords (and bar lines), no empty lyric row under them.
@@ -77,7 +67,7 @@ function LyricLine({segments, renderChord}) {
             <div className={styles.chordRow}>
                 {segments.map(([chord, text], i) => (
                     <React.Fragment key={i}>
-                        {chord && <span className={styles.chord}>{renderChord(chord)}</span>}
+                        {chord && <Chord name={renderChord(chord)} />}
                         {text.trim() && <span className={styles.bars}>{text.trim()}</span>}
                     </React.Fragment>
                 ))}
@@ -93,7 +83,7 @@ function LyricLine({segments, renderChord}) {
                 <span key={i} className={styles.word}>
                     {word.map((piece, j) => (piece.chord ? (
                         <span key={j} className={styles.anchor}>
-                            <span className={styles.chord}>{renderChord(piece.chord)}</span>
+                            <Chord name={renderChord(piece.chord)} />
                             <span>{piece.text || '\u00a0'}</span>
                         </span>
                     ) : piece.text))}
@@ -121,61 +111,90 @@ function firstLineOf(song, title) {
     return line ? line.map(([, text]) => text).join('').replace(/\s+/g, ' ').replace(/[\s,.;:!?–-]+$/, '').trim() : '';
 }
 
+// Every chord of the song once, in order of appearance (sequences split up).
+function uniqueChords(song, renderChord) {
+    const seen = new Set();
+    for (const section of song.sections) {
+        for (const line of section.lines) {
+            if (!Array.isArray(line)) continue;
+            for (const [chord] of line) {
+                if (chord) chordsIn(renderChord(chord)).forEach((name) => seen.add(name));
+            }
+        }
+    }
+    return [...seen];
+}
+
+// Diagrams need the shapes database: this loads it and re-renders when it is in.
+function useShapes(wanted) {
+    const [, setLoaded] = useState(shapesLoaded());
+    useEffect(() => {
+        if (wanted && !shapesLoaded()) loadShapes().then(() => setLoaded(true));
+    }, [wanted]);
+    return shapesLoaded();
+}
+
+// The diagram of the chord under the pointer (or focused, or tapped), below it.
+function useChordPopover(container) {
+    const [popover, setPopover] = useState(null);
+    const show = (target) => {
+        const chord = target && target.closest && target.closest('[data-chord]');
+        if (!chord || !container.current) return;
+        const box = container.current.getBoundingClientRect();
+        const at = chord.getBoundingClientRect();
+        if (!shapesLoaded()) loadShapes().then(() => setPopover((current) => current && {...current}));
+        setPopover({name: chord.dataset.chord, left: at.left - box.left, top: at.bottom - box.top + 4});
+    };
+    const hide = (event) => {
+        const to = event.relatedTarget;
+        if (!to || !to.closest || !to.closest('[data-chord]')) setPopover(null);
+    };
+    return {
+        popover,
+        handlers: {
+            onMouseOver: (e) => show(e.target),
+            onFocus: (e) => show(e.target),
+            onClick: (e) => (e.target.closest('[data-chord]') ? show(e.target) : setPopover(null)),
+            onMouseOut: hide,
+            onBlur: hide,
+        },
+    };
+}
 
 // The whole song page: lyrics always (rendered on the server, so search and
-// no-JS readers get them), chords and transposition when switched on.
-export default function ChordSheet({song}) {
-    const [show, setShow] = useState(false);
-    const [semitones, setSemitones] = useState(0);
+// no-JS readers get them), chords, transposition and diagrams as the chord menu
+// beside the breadcrumbs sets them. `preview` (the correction editor) always shows
+// the chords as written and leaves the page's settings alone.
+export default function ChordSheet({song, preview = false}) {
+    const settings = useChordState();
     const firstChord = useMemo(() => firstChordOf(song), [song]);
+    const show = preview || settings.show;
+    const semitones = preview ? 0 : settings.semitones;
     const names = noteNamesFor(firstChord, semitones);
     const chordsOn = show && firstChord !== null;
     const renderChord = chordsOn ? (chord) => transposeChord(chord, semitones, names) : null;
+    const diagramsOn = chordsOn && !preview && settings.diagrams;
+    const container = useRef(null);
+    const {popover, handlers} = useChordPopover(container);
+    const shapes = useShapes(diagramsOn);
 
-    useEffect(() => {
-        setShow(readStorage(SHOW_KEY) === '1');
-        setSemitones(parseInt(readStorage(transposeKey(song.id)), 10) || 0);
-    }, [song.id]);
-
-    const toggle = () => {
-        writeStorage(SHOW_KEY, show ? '0' : '1');
-        setShow(!show);
-    };
-    const shift = (delta) => {
-        const next = delta === 0 ? 0 : ((semitones + delta + 18) % 12) - 6;
-        writeStorage(transposeKey(song.id), next === 0 ? null : String(next));
-        setSemitones(next);
-    };
+    useEffect(() => (preview ? undefined : registerSong({id: song.id, firstChord})), [preview, song.id, firstChord]);
 
     return (
-        <div className={styles.chordSheet}>
+        <div className={styles.chordSheet} ref={container} {...(chordsOn ? handlers : {})}>
             {song.credits && <div className={styles.credits}>{song.credits}</div>}
-            {firstChord && (
-                <div className={clsx(styles.toolbar, 'chordsheet-controls')}>
-                    <button
-                        type="button"
-                        className={clsx('button button--sm', show ? 'button--primary' : 'button--outline button--primary')}
-                        aria-pressed={show}
-                        onClick={toggle}>
-                        🎼 {show ? 'Скрий акордите' : 'Покажи акордите'}
-                    </button>
-                    {show && (
-                        <span className={styles.transpose}>
-                            <button type="button" className="button button--sm button--secondary"
-                                aria-label="Транспонирай половин тон надолу" onClick={() => shift(-1)}>−</button>
-                            <span className={styles.key} title="Тоналност">
-                                {renderChord(firstChord)}
-                                {semitones !== 0 && ` (${semitones > 0 ? '+' : ''}${semitones})`}
-                            </span>
-                            <button type="button" className="button button--sm button--secondary"
-                                aria-label="Транспонирай половин тон нагоре" onClick={() => shift(1)}>+</button>
-                            {semitones !== 0 && (
-                                <button type="button" className="button button--sm button--link" onClick={() => shift(0)}>
-                                    Оригинал
-                                </button>
-                            )}
-                        </span>
-                    )}
+            {diagramsOn && shapes && (
+                <div className={clsx(styles.diagrams, 'chordsheet-controls')} aria-label="Схеми на акордите">
+                    {uniqueChords(song, renderChord).map((name) => (
+                        <ChordDiagram key={name} name={name} shape={shapeOf(name)} />
+                    ))}
+                </div>
+            )}
+            {chordsOn && popover && shapesLoaded() && (
+                <div className={clsx(styles.popover, 'chordsheet-controls')} style={{left: popover.left, top: popover.top}}>
+                    {chordsIn(popover.name).map((name) => (
+                        <ChordDiagram key={name} name={name} shape={shapeOf(name)} />
+                    ))}
                 </div>
             )}
             {song.sections.map((section, s) => {

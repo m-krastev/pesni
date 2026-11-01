@@ -4,6 +4,7 @@
 const {themes} = require('prism-react-renderer');
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
+const {BOOKS} = require('./scripts/songs/books.mjs');
 
 
 /** @type {import('@docusaurus/types').Config} */
@@ -31,6 +32,8 @@ const config = {
         locales: ['bg'],
     },
 
+    clientModules: [require.resolve('./src/fonts.js')],
+
     presets: [
         [
             'classic',
@@ -55,7 +58,7 @@ const config = {
                 //   //   'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
                 // },
                 theme: {
-                    customCss: require.resolve('./src/css/custom.css'),
+                    customCss: [require.resolve('./src/css/custom.css'), require.resolve('./src/css/palettes.css')],
                 },
             }),
         ],
@@ -64,33 +67,29 @@ const config = {
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
+            colorMode: {respectPrefersColorScheme: true},
             metadata: [
                 {name: 'description', content: 'Християнски песни за хваление и поклонение'},
                 {name: "keywords", content: "християнски, песни, хваление, поклонение, бог, библия, християнство, християни, акорди, музика, текст, текст на песни, текстове, евангелски песни"}
             ],
             navbar: {
-                title: 'Песни',
-                // logo: {
-                //   alt: 'My Site Logo',
-                //   src: 'img/logo.svg',
-                // },
+                // No site title: the first tab (Песни) already leads home.
+                logo: {alt: 'ProPoVedi', src: 'img/logo_propovedi.png'},
                 items: [
-                    //   {
-                    //     type: 'doc',
-                    //     docId: 'intro',
-                    //     position: 'left',
-                    //     label: 'Песни',
-                    //   },
+                    // One tab per songbook (scripts/songs/books.mjs).
+                    ...BOOKS.map((book) => ({
+                        type: 'docSidebar',
+                        sidebarId: 'songs',
+                        docsPluginId: book.id === 'pesni' ? undefined : book.id,
+                        label: book.label,
+                        position: 'left',
+                    })),
                     {
                         href: 'https://propovedi.org/',
                         label: 'ProPoVedi',
                         position: 'right',
                     },
-                    {
-                        href: 'https://propovedi.org/pesnarka/',
-                        label: 'Песнарка',
-                        position: 'right',
-                    },
+                    {type: 'custom-paletteMenu', position: 'right'},
                     {
                         href: 'https://github.com/m-krastev/pesni',
                         position: 'right',
@@ -150,6 +149,16 @@ const config = {
             },
         }),
     plugins: [
+        // Every songbook except Песни (the preset's docs) is its own docs instance.
+        ...BOOKS.filter((book) => book.id !== 'pesni').map((book) => [
+            '@docusaurus/plugin-content-docs',
+            {
+                id: book.id,
+                path: book.docs,
+                routeBasePath: book.route,
+                sidebarPath: require.resolve(`./src/data/sidebars/${book.id}.json`),
+            },
+        ]),
         // [
             // require.resolve("@cmfcmf/docusaurus-search-local"),
             // {
@@ -233,8 +242,9 @@ const config = {
                                         doc.style.setProperty("--custom-line-height",storage.getItem("lineHeight"));
                                         doc.style.setProperty("--custom-font-weight",storage.getItem("fontWeight"));
                                         doc.style.setProperty("--custom-font-factor",storage.getItem("fontSizeFactor"));
+                                        if (storage.getItem("palette")) doc.dataset.palette = storage.getItem("palette");
                                     }
-                                    loadFontSettingsFromLocalStorage();
+                                    try { loadFontSettingsFromLocalStorage(); } catch (e) {}
                                     `
                             }
                         ]
@@ -254,7 +264,11 @@ const config = {
               // ... Your options.
               // `hashed` is recommended as long-term-cache of index file is possible.
               indexBlog:false,
-              docsRouteBasePath: '/',
+              docsRouteBasePath: BOOKS.map((book) => book.route || '/'),
+              docsDir: BOOKS.map((book) => book.docs),
+              // One search index per book; the search page can still search them all.
+              searchContextByPaths: BOOKS.filter((book) => book.route).map((book) => ({label: book.label, path: book.route})),
+              useAllContextsWithNoSearchContext: true,
               hashed: true,
               // Russian for the Cyrillic tokenizer (there is no Bulgarian); English for original titles.
               language: ["ru", "en"],
