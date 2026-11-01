@@ -3,7 +3,7 @@
 #import "style.typ": songbook
 #import sys.inputs.song: song
 
-#set document(title: "Акорди")
+#set document(title: "Акорди", date: none)
 #show: songbook
 
 #song

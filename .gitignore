@@ -27,3 +27,5 @@ archive
 /static/openlp/
 /static/pdf/
 /static/chords/
+/.deployed/
+/static/[0-9]*/

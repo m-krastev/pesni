@@ -13,6 +13,8 @@ songs/NNN-slug.cho ──► docs/NNN.md + src/data/songs/NNN.json   website pag
 ```
 
 On a song page you can show or hide the chords and transpose them; the choice is remembered per browser.
+Short links by number lead to a song's page and files: `/52`, `/pdf/52`, `/chords/52`. Typing a number in
+the search box finds that song.
 
 ## Editing a song
 
@@ -75,8 +77,11 @@ npm run songs && typst compile --root . typ/all.typ songbook.pdf
 ## Deployment
 
 Pushing to `main` runs [the GitHub Actions workflow](.github/workflows/site.yml): tests, build, and upload to
-the FTP server. Other branches and pull requests are only tested and built. The upload copies files and
-never deletes anything on the server.
+the FTP server. Other branches and pull requests are only tested and built.
+
+[`scripts/deploy.sh`](scripts/deploy.sh) uploads only the files whose content changed since the last deploy
+(it keeps a copy of that build in `.deployed/`; CI keeps it in the Actions cache). It never deletes anything
+on the server. Without a previous deploy it compares with the server by file size and re-uploads all pages.
 
 The workflow needs two repository secrets (Settings → Secrets and variables → Actions):
 

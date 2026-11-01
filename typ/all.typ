@@ -3,7 +3,7 @@
 #import "style.typ": songbook
 #import "generated/songs.typ": songs
 
-#set document(title: "Песни")
+#set document(title: "Песни", date: none)
 #show: songbook
 
 #for (i, s) in songs.enumerate() {

@@ -10,11 +10,11 @@ export function DownloadsButton({ pdf }) {
         </div>
     );
 }
-export function DownloadChordsButton({ pdf }) {
+export function DownloadChordsButton({ pdf, label = 'Акорди' }) {
     return (
         <div className={styles.downloadsbutton}>
             <a href={pdf} target="_blank" className="button button--secondary button--lg">
-                🎼 Акорди
+                🎼 {label}
             </a>
         </div>
     );

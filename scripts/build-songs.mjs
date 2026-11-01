@@ -7,6 +7,7 @@
 //   static/pdf/N-slug.pdf        printable lyrics
 //   static/chords/N-slug_akord.pdf  printable chord sheet (songs with chords)
 //   static/openlp/*.xml          OpenLyrics for OpenLP, plus pesni-openlp.zip with all songs
+//   static/{pdf,chords,}/N/      short links: /pdf/52, /chords/52 and /52 lead to the song's files and page
 //
 // Runs before `npm run build` / `npm start`. A song that does not parse, uses an
 // unknown directive or an unknown chord stops the build. PDFs are re-rendered
@@ -19,7 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {SongError, hasChords, openLyrics, page, pageData, parseSong, typModule} from './songs/lib.mjs';
+import {SongError, hasChords, openLyrics, page, pageData, parseSong, redirectPage, typModule} from './songs/lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SONGS = path.join(ROOT, 'songs');
@@ -62,6 +63,17 @@ function renderPdf(template, modulePath, pdfPath, force) {
     return true;
 }
 
+// The song's chord PDF from the old site, archived in static/old_chords (matched by
+// slug, or by number when only one file has it).
+function originalChords(number, slug) {
+    const dir = path.join(STATIC, 'old_chords');
+    const pdfs = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /_akord\.pdf$/i.test(f)) : [];
+    const exact = pdfs.find((f) => f.toLowerCase() === `${number}-${slug}_akord.pdf`);
+    const byNumber = pdfs.filter((f) => f.startsWith(`${number}-`));
+    const file = exact || (byNumber.length === 1 ? byNumber[0] : null);
+    return file && `/old_chords/${file}`;
+}
+
 function main() {
     const args = process.argv.slice(2);
     const forcePdf = args.includes('--force-pdf');
@@ -102,7 +114,14 @@ function main() {
         }
         const downloads = [`<DownloadsButton pdf="${lyricsPdf}" />`];
         if (chordsPdf) downloads.push(`<DownloadChordsButton pdf="${chordsPdf}"/>`);
+        const original = originalChords(number, slug);
+        if (original) downloads.push(`<DownloadChordsButton pdf="${original}" label="Акорди (оригинал)"/>`);
         writeIfChanged(path.join(DOCS, `${id}.md`), page(number, song, file, downloads));
+
+        // Short links by number. Song pages already answer to /100../239/.
+        writeIfChanged(path.join(STATIC, 'pdf', String(number), 'index.html'), redirectPage(lyricsPdf));
+        if (chordsPdf) writeIfChanged(path.join(STATIC, 'chords', String(number), 'index.html'), redirectPage(chordsPdf));
+        if (String(number) !== id) writeIfChanged(path.join(STATIC, String(number), 'index.html'), redirectPage(`/${id}/`));
     }
     if (errors.length) {
         console.error(`\n${errors.length} song(s) could not be built:\n  ${errors.join('\n  ')}`);

@@ -11,7 +11,7 @@
     "prebuild": "npm run songs",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
-    "deploy": "rclone copy build propovedi:pesni.propovedi.org --exclude \"chord-thumbnails/**\" --transfers 2 --checkers 2 --ftp-concurrency 4 --stats-one-line --stats 60s",
+    "deploy": "bash scripts/deploy.sh",
     "clear": "docusaurus clear",
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
