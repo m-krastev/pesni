@@ -256,9 +256,16 @@ const config = {
               indexBlog:false,
               docsRouteBasePath: '/',
               hashed: true,
-              // Selecting Russian as there is no Bulgarian.
-              language: ["ru"],
+              // Russian for the Cyrillic tokenizer (there is no Bulgarian); English for original titles.
+              language: ["ru", "en"],
               highlightSearchTermsOnTargetPage:false,
+              // The chord toggle and section labels ("Куплет 1") are not lyrics.
+              ignoreCssSelectors: ['.chordsheet-controls', '.chordsheet-label'],
+              // The Russian stemmer mangles Bulgarian words, so partial words did not match.
+              removeDefaultStemmer: true,
+              searchResultLimits: 10,
+              // Typo tolerance ranked unrelated songs above the word being typed.
+              fuzzyMatchingDistance: 0,
             },
         ]
     ]

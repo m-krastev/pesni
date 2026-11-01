@@ -119,7 +119,7 @@ export default function ChordSheet({song}) {
         <div className={styles.chordSheet}>
             {song.credits && <div className={styles.credits}>{song.credits}</div>}
             {firstChord && (
-                <div className={styles.toolbar}>
+                <div className={clsx(styles.toolbar, 'chordsheet-controls')}>
                     <button
                         type="button"
                         className={clsx('button button--sm', show ? 'button--primary' : 'button--outline button--primary')}
@@ -153,7 +153,7 @@ export default function ChordSheet({song}) {
                 if (section.lines.length && !lines.some((line) => line !== null)) return null;
                 return (
                     <section key={s} className={clsx(styles.section, /^припев/i.test(section.title) && styles.chorus)}>
-                        {section.title && <div className={styles.sectionTitle}>{section.title}</div>}
+                        {section.title && <div className={clsx(styles.sectionTitle, 'chordsheet-label')}>{section.title}</div>}
                         {lines.map((line, i) => {
                             if (line === null) {
                                 return i > 0 && lines[i - 1] !== null ? <div key={i} className={styles.stanzaBreak} /> : null;

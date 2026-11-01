@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {SongError, credits, isChord, openLyrics, page, parseSong, typModule} from './lib.mjs';
+import {SongError, credits, isChord, openLyrics, page, parseSong, redirectPage, typModule} from './lib.mjs';
 
 const SONGS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../songs');
 
@@ -65,7 +65,7 @@ test('writes conchord Typst for the chord sheet and plain lyrics', () => {
     assert.match(typ, /АЛЕ\[Em\] ЛУЯ! \[C\\#m\] ТИ СИ ЦАР! \\/);
     assert.match(typ, /\[E\] `   ` \[A\] `   ` \[E\] \\/);
     assert.match(typ, /ВЪЗКРЪСНА \\<С МОЩ\\> \[D\/Em\] \\/);
-    assert.match(typ, /song-info\[Оригинал: „I Exalt Thee“ · Pete Sanchez Jr\.\]/);
+    assert.match(typ, /song-info\[Оригинал: I Exalt Thee · Pete Sanchez Jr\.\]/);
     const lyrics = typ.slice(typ.indexOf('#let lyrics'));
     assert.doesNotMatch(lyrics, /\[Em\]|\[E\]/);
     assert.match(lyrics, /#chorus\[\nВЪЗКРЪСНА \\<С МОЩ\\> \\\n\]/);
@@ -99,7 +99,7 @@ test('writes a page that MDX can compile', () => {
 test('formats credits', () => {
     assert.equal(credits({}), '');
     assert.equal(credits({original: 'Creo en Ti', artist: 'Julio Melgar', translator: 'Х'}),
-        'Оригинал: „Creo en Ti“ · Julio Melgar · Превод: Х');
+        'Оригинал: Creo en Ti · Julio Melgar · Превод: Х');
 });
 
 test('every song in songs/ builds', () => {
@@ -109,3 +109,10 @@ test('every song in songs/ builds', () => {
         assert.doesNotThrow(() => parseSong(fs.readFileSync(path.join(SONGS, file), 'utf8')), file);
     }
 });
+
+test('writes redirect pages for short links', () => {
+    const html = redirectPage('/pdf/1-mir-kato-reka.pdf');
+    assert.match(html, /<meta http-equiv="refresh" content="0; url=\/pdf\/1-mir-kato-reka\.pdf">/);
+    assert.match(html, /location\.replace\("\/pdf\/1-mir-kato-reka\.pdf"\)/);
+});
+

@@ -28,3 +28,4 @@ archive
 /static/pdf/
 /static/chords/
 /.deployed/
+/static/[0-9]*/

@@ -103,10 +103,11 @@ export function parseSong(source) {
     return song;
 }
 
-/** One line of credits, e.g. `Оригинал: „I Exalt Thee“ · Pete Sanchez Jr. · Превод: ...`. */
+/** One line of credits, e.g. `Оригинал: I Exalt Thee · Pete Sanchez Jr. · Превод: ...`. No quotes
+ * around the title: the site search would index them as part of the first and last word. */
 export function credits(meta) {
     const parts = [];
-    if (meta.original) parts.push(`Оригинал: „${meta.original}“`);
+    if (meta.original) parts.push(`Оригинал: ${meta.original}`);
     const authors = [meta.artist, meta.lyricist, meta.composer].filter(Boolean);
     if (authors.length) parts.push([...new Set(authors)].join(', '));
     if (meta.translator) parts.push(`Превод: ${meta.translator}`);
@@ -282,3 +283,22 @@ export function pageData(number, song) {
     const id = String(number).padStart(3, '0');
     return {id, credits: credits(song.meta), copyright: song.meta.copyright || '', sections: song.sections};
 }
+
+/** A static page that sends the browser on to `target` (for short links such as /pdf/52). */
+export function redirectPage(target) {
+    const url = target.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    return `<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<title>Пренасочване</title>
+<meta http-equiv="refresh" content="0; url=${url}">
+<link rel="canonical" href="${url}">
+<meta name="robots" content="noindex">
+<script>location.replace(${JSON.stringify(target)})</script>
+</head>
+<body><a href="${url}">${url}</a></body>
+</html>
+`;
+}
+
