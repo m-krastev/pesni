@@ -32,6 +32,7 @@ archive
 /static/[0-9]*/
 /docs-*/
 /src/data/sidebars/
+/src/data/books.json
 /src/data/rozhdestvo/
 /src/data/pesnarka/
 /src/data/new/

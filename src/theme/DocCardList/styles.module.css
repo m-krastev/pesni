@@ -1,0 +1,39 @@
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 2 22rem;
+    column-gap: 2.5rem;
+    font-family: var(--ifm-font-family-base);
+}
+
+.list li {
+    break-inside: avoid;
+}
+
+.entry {
+    display: block;
+    padding: 0.55rem 0.25rem;
+    border-bottom: 1px solid var(--site-border);
+    color: inherit;
+}
+
+.entry:hover {
+    color: var(--ifm-color-primary);
+    text-decoration: none;
+}
+
+.title {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.firstLine {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--site-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

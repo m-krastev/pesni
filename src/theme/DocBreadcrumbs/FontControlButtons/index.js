@@ -1,118 +1,57 @@
-import React from 'react';
-import clsx from 'clsx';
-import {
-    ThemeClassNames,
-} from '@docusaurus/theme-common';
-import styles from './styles.module.css';
+import React, {useState} from 'react';
+import styles from '../styles.module.css';
 
-function incrementDecrementFactor(increment) {
-    const doc = document.querySelector(":root");
-    let factor = parseFloat(getComputedStyle(doc).getPropertyValue("--custom-font-factor"));
-    
-    factor = increment ? factor + 0.1 : factor - 0.1;
+// Text size, weight and line spacing of the lyrics: CSS variables on :root, kept in
+// localStorage and restored before the page paints (the load-font-settings plugin
+// in docusaurus.config.js).
+const LINE_HEIGHTS = [1.2, 1.5, 2.0];
 
-    if (factor >= 0.8 && factor <= 2.5) {
-        doc.style.setProperty('--custom-font-factor', factor);
-        window.localStorage.setItem('fontSizeFactor',factor);
+function rootVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function setRootVar(name, storageKey, value) {
+    document.documentElement.style.setProperty(name, value);
+    try {
+        window.localStorage.setItem(storageKey, value);
+    } catch (e) {
+        // Without storage the setting lasts until the page is left.
     }
 }
 
-// function changeFontFactor(factor){
-//     if(factor >= 0.5 && factor <= 2.0){
-//         const doc = document.querySelector(":root");
-//         doc.style.setProperty('--custom-font-factor',factor);
-//     }
-// }
-
-export function FontSizeButtons() {
-    return (
-        <React.Fragment>
-            <span className={styles.fontControlButton} onClick={()=>incrementDecrementFactor(false)} aria-label="">a</span>
-            |
-            <span className={styles.fontControlButton} onClick={()=>incrementDecrementFactor(true)} aria-label="">A</span>
-        </React.Fragment>
-    )
+function changeSize(step) {
+    const factor = Math.round((parseFloat(rootVar('--custom-font-factor')) || 1) * 10 + step) / 10;
+    if (factor >= 0.8 && factor <= 2.5) setRootVar('--custom-font-factor', 'fontSizeFactor', String(factor));
 }
 
-
-function invertFontWeight() {
-    const doc = document.querySelector(":root");
-    var fontWeight = getComputedStyle(doc).getPropertyValue("--custom-font-weight");
-    const button = document.getElementsByClassName(styles.fontBoldButton)[0];
-    if (fontWeight === "bold") {
-        doc.style.setProperty("--custom-font-weight", "normal");
-        button.classList.replace(styles.bold, styles.outlined);
-        window.localStorage.setItem('fontWeight',"normal")
-    }
-    else {
-        doc.style.setProperty("--custom-font-weight", "bold");
-        button.classList.replace(styles.outlined, styles.bold);
-        window.localStorage.setItem('fontWeight',"bold")
-    }
-
+function nextLineHeight() {
+    const current = parseFloat(rootVar('--custom-line-height')) || 1.5;
+    const next = LINE_HEIGHTS[(LINE_HEIGHTS.indexOf(current) + 1) % LINE_HEIGHTS.length] || 1.5;
+    setRootVar('--custom-line-height', 'lineHeight', String(next));
 }
-
-export function FontBoldButton() {
-    const initialStyle = getComputedStyle(document.querySelector(":root")).getPropertyValue("--custom-font-weight") === "bold" ? styles.bold : styles.outlined
-
-    return (
-        <span className={clsx(styles.fontControlButton, styles.fontBoldButton, initialStyle)} onClick={invertFontWeight} aria-label="">A</span>
-    )
-}
-
-function changeLineHeight(){
-    const doc = document.querySelector(":root")
-    var lineHeight = parseFloat(getComputedStyle(doc).getPropertyValue("--custom-line-height"));
-    switch(lineHeight){
-        case 1.5:
-            lineHeight = 2.0
-            break;
-        case 2.0:
-            lineHeight = 1.20;
-            break;
-        case 1.20:
-            lineHeight = 1.5;
-            break;
-        default:
-            lineHeight = 1.5;
-            break;
-    }
-    doc.style.setProperty("--custom-line-height",lineHeight);
-    window.localStorage.setItem('lineHeight',lineHeight)
-}
-
-export function LineHeightButton(){
-    return(
-        <span className={clsx(styles.fontControlButton,styles.lineHeightButton)} onClick={changeLineHeight}>
-           <svg xmlns="http://www.w3.org/2000/svg" aria-label="">
-            <path d="M12 40.05 4 32.05 6.1 29.95 10.5 34.25V13.85L6.1 18.15L4 16.05L12 8.05L20 16.05L17.9 18.15L13.5 13.85V34.25L17.9 29.95L20 32.05ZM24 38V35H44V38ZM24 25.5V22.5H44V25.5ZM24 13V10H44V13Z"/>       
-        </svg>          
-        </span>
-
-
-    )
-}
-
-// function LoadFontSettingsFromLocalStorage(){
-//     const style = getComputedStyle(document.querySelector(":root"))
-//     const storage = window.localStorage
-//     style.setProperty("--custom-line-height",storage.getItem("lineHeight"))
-//     style.setProperty("--custom-font-weight",storage.getItem("fontWeight"))
-//     style.setProperty("--custom-font-factor",storage.getItem("fontSizeFactor"))
-//     console.log("styles loaded")
-// }
 
 export default function FontControlButtons() {
+    const [bold, setBold] = useState(() => rootVar('--custom-font-weight') === 'bold');
+    const toggleBold = () => {
+        setRootVar('--custom-font-weight', 'fontWeight', bold ? 'normal' : 'bold');
+        setBold(!bold);
+    };
     return (
-            <div
-                className={clsx(
-                    ThemeClassNames.docs.docBreadcrumbs,
-                    styles.fontControlBar,
-                )}
-                aria-label="">
-                <FontSizeButtons /> | <FontBoldButton /> | <LineHeightButton/>
-            </div>
-
-    )
-
+        <div className={styles.tools} role="group" aria-label="Текст">
+            <button type="button" className={styles.tool} onClick={() => changeSize(-1)} title="По-малък текст" aria-label="По-малък текст">
+                <span className={styles.smallA}>A</span>
+            </button>
+            <button type="button" className={styles.tool} onClick={() => changeSize(1)} title="По-голям текст" aria-label="По-голям текст">
+                <span className={styles.bigA}>A</span>
+            </button>
+            <button type="button" className={styles.tool} onClick={toggleBold} aria-pressed={bold} title="Удебелен текст" aria-label="Удебелен текст">
+                <b>B</b>
+            </button>
+            <button type="button" className={styles.tool} onClick={nextLineHeight} title="Разстояние между редовете" aria-label="Разстояние между редовете">
+                <svg viewBox="0 0 24 24" className={styles.icon} aria-hidden="true">
+                    <path d="M6 3 2.5 6.5h2.5v11H2.5L6 21l3.5-3.5H7v-11h2.5zM12 5h10v2H12zm0 6h10v2H12zm0 6h10v2H12z" />
+                </svg>
+            </button>
+        </div>
+    );
 }

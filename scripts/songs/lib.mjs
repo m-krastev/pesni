@@ -284,9 +284,11 @@ export function page(number, song, {source, data, suggest, downloads = []}) {
             ? ['', `<SongMedia${MEDIA.filter((k) => song.meta[k])
                 .map((k) => ` ${k}=${JSON.stringify(song.meta[k])}`).join('')} />`]
             : []),
-        ...downloads.flatMap((d) => ['', d]),
         '',
+        '<div className="song-actions">',
+        ...downloads,
         `<SuggestEdit file="${suggest}" />`,
+        '</div>',
     ].join('\n') + '\n';
 }
 

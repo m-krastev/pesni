@@ -160,7 +160,9 @@ plus a hidden field that bots fill in.
 | `books/` | the other songbooks, one folder each |
 | `scripts/build-songs.mjs`, `scripts/songs/` | the song build and its tests |
 | `typ/` | Typst templates for the printed sheets (`style.typ` holds the look) |
-| `src/components/ChordSheet/` | the song view: lyrics, chords, transposition |
+| `src/components/ChordSheet/` | the song view: lyrics, chords, transposition, chord diagrams (shapes from `@tombatossals/chords-db`) |
+| `src/theme/DocBreadcrumbs/` | the song's menus beside the breadcrumbs: chords (on/off, key, diagrams) and text size |
+| `src/pages/index.js`, `src/css/`, `src/components/PaletteMenu/` | the home page, the look (Inter, colors) and the palettes of the navbar's color menu |
 | `src/components/SuggestEdit/`, `static/api/` | the correction editor and its PHP backend |
 | `static/old_chords/`, `static/old_pdf/` | the original chord and lyrics files, kept unchanged |
 

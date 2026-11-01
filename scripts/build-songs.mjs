@@ -103,9 +103,9 @@ const collator = new Intl.Collator('bg', {sensitivity: 'base', numeric: true});
 const byTitle = (a, b) => collator.compare(a.title.replace(/^[^\p{L}\d]+/u, ''), b.title.replace(/^[^\p{L}\d]+/u, ''));
 const initial = (title) => (title.replace(/^[^\p{L}\d]+/u, '')[0] || '#').toLocaleUpperCase('bg');
 
-// Песни keeps its sidebar of fixed ranges (and their old URLs: the home page is
-// the first range). Other books list their songs, then the extra links.
-const PESNI_SLUGS = {1: '/', 51: '/51-100/', 101: '/101-150/', 151: '/150-201/', 201: '/201-250/'};
+// Песни keeps its sidebar of fixed ranges (and their old URLs; the first range moved
+// from / to /1-50/ when the site got a home page). Other books list their songs, then the extra links.
+const PESNI_SLUGS = {1: '/1-50/', 51: '/51-100/', 101: '/101-150/', 151: '/150-201/', 201: '/201-250/'};
 
 function sidebar(book, songs, paths) {
     if (paths.main) {
@@ -239,6 +239,10 @@ function main() {
 
     const errors = [];
     const results = BOOKS.map((book) => [book, buildBook(book, {wanted, forcePdf, typst, errors})]);
+    // The books with their song counts, for the home page (src/pages/index.js).
+    writeIfChanged(path.join(ROOT, 'src', 'data', 'books.json'), JSON.stringify(results.map(([book, r]) => ({
+        id: book.id, label: book.label, route: book.route, intro: book.intro || '', count: r.count,
+    })), null, 1) + '\n');
     // Where each book's pages live, for the suggestion review page (static/api/suggestions.php).
     writeIfChanged(path.join(STATIC, 'cho', 'books.json'),
         JSON.stringify(Object.fromEntries(BOOKS.map((book) => [bookPaths(book).cho.replace(/\/$/, ''), book.route]))) + '\n');

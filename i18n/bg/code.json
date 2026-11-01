@@ -1,0 +1,12 @@
+{
+  "theme.SearchBar.label": {"message": "Търсене"},
+  "theme.SearchBar.noResultsText": {"message": "Няма резултати"},
+  "theme.SearchBar.seeAll": {"message": "Всички резултати"},
+  "theme.SearchBar.seeAllOutsideContext": {"message": "Резултати и извън „{context}“"},
+  "theme.SearchBar.searchInContext": {"message": "Всички резултати в „{context}“"},
+  "theme.SearchPage.documentsFound.plurals": {"message": "1 песен|{count} песни"},
+  "theme.SearchPage.emptyResultsTitle": {"message": "Търсене на песен"},
+  "theme.SearchPage.existingResultsTitle": {"message": "Резултати за „{query}“"},
+  "theme.SearchPage.noResultsText": {"message": "Не са намерени песни"},
+  "theme.SearchPage.searchContext.everywhere": {"message": "Всички сборници"}
+}

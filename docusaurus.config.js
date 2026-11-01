@@ -32,6 +32,8 @@ const config = {
         locales: ['bg'],
     },
 
+    clientModules: [require.resolve('./src/fonts.js')],
+
     presets: [
         [
             'classic',
@@ -56,7 +58,7 @@ const config = {
                 //   //   'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
                 // },
                 theme: {
-                    customCss: require.resolve('./src/css/custom.css'),
+                    customCss: [require.resolve('./src/css/custom.css'), require.resolve('./src/css/palettes.css')],
                 },
             }),
         ],
@@ -65,16 +67,14 @@ const config = {
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
+            colorMode: {respectPrefersColorScheme: true},
             metadata: [
                 {name: 'description', content: 'Християнски песни за хваление и поклонение'},
                 {name: "keywords", content: "християнски, песни, хваление, поклонение, бог, библия, християнство, християни, акорди, музика, текст, текст на песни, текстове, евангелски песни"}
             ],
             navbar: {
                 // No site title: the first tab (Песни) already leads home.
-                // logo: {
-                //   alt: 'My Site Logo',
-                //   src: 'img/logo.svg',
-                // },
+                logo: {alt: 'ProPoVedi', src: 'img/logo_propovedi.png'},
                 items: [
                     // One tab per songbook (scripts/songs/books.mjs).
                     ...BOOKS.map((book) => ({
@@ -89,6 +89,7 @@ const config = {
                         label: 'ProPoVedi',
                         position: 'right',
                     },
+                    {type: 'custom-paletteMenu', position: 'right'},
                     {
                         href: 'https://github.com/m-krastev/pesni',
                         position: 'right',
@@ -241,8 +242,9 @@ const config = {
                                         doc.style.setProperty("--custom-line-height",storage.getItem("lineHeight"));
                                         doc.style.setProperty("--custom-font-weight",storage.getItem("fontWeight"));
                                         doc.style.setProperty("--custom-font-factor",storage.getItem("fontSizeFactor"));
+                                        if (storage.getItem("palette")) doc.dataset.palette = storage.getItem("palette");
                                     }
-                                    loadFontSettingsFromLocalStorage();
+                                    try { loadFontSettingsFromLocalStorage(); } catch (e) {}
                                     `
                             }
                         ]

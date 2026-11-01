@@ -1,8 +1,13 @@
 .media {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin: 1rem 0;
+    gap: 0.6rem;
+    margin: 2rem 0 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--site-border);
+    border-radius: var(--ifm-global-radius);
+    background: var(--site-surface);
+    font-family: var(--ifm-font-family-base);
 }
 
 .audio {
@@ -15,7 +20,8 @@
 .label {
     min-width: 5.5rem;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    color: var(--site-muted);
 }
 
 .audio audio {

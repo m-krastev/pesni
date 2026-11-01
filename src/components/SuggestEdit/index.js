@@ -67,11 +67,10 @@ export default function SuggestEdit({file}) {
 
     if (!open) {
         return (
-            <div className={clsx(styles.suggest, 'chordsheet-controls')}>
-                <button type="button" className="button button--link" onClick={() => setOpen(true)}>
-                    ✏️ Предложи корекция
-                </button>
-            </div>
+            <button type="button" className={clsx(styles.trigger, 'chordsheet-controls')} onClick={() => setOpen(true)}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.3V20h2.7l8-8L12 9.3zM19.7 7a1 1 0 0 0 0-1.4L18.4 4.3a1 1 0 0 0-1.4 0l-1.6 1.6L18.1 8.6z" /></svg>
+                Предложи корекция
+            </button>
         );
     }
 
@@ -107,7 +106,7 @@ export default function SuggestEdit({file}) {
                         <div className={styles.previewLabel}>Преглед</div>
                         {preview && preview.error
                             ? <p className={styles.error}>Грешка: {preview.error}</p>
-                            : preview && <ChordSheet song={preview.song} />}
+                            : preview && <ChordSheet song={preview.song} preview />}
                     </div>
                     <label className={styles.field}>
                         Какво поправихте? (по желание)
