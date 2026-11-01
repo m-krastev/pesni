@@ -5,5 +5,16 @@
 }
 
 .downloadsbutton > a{
-    width: 10rem;
+    min-width: 10rem;
+}
+
+/* On phones the buttons stack; a longer label grows its button instead of overflowing. */
+@media (max-width: 480px) {
+    .downloadsbutton {
+        margin-top: 1rem;
+    }
+
+    .downloadsbutton:first-of-type {
+        margin-top: 3rem;
+    }
 }

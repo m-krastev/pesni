@@ -62,6 +62,17 @@ function renderPdf(template, modulePath, pdfPath, force) {
     return true;
 }
 
+// The song's chord PDF from the old site, archived in static/old_chords (matched by
+// slug, or by number when only one file has it).
+function originalChords(number, slug) {
+    const dir = path.join(STATIC, 'old_chords');
+    const pdfs = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /_akord\.pdf$/i.test(f)) : [];
+    const exact = pdfs.find((f) => f.toLowerCase() === `${number}-${slug}_akord.pdf`);
+    const byNumber = pdfs.filter((f) => f.startsWith(`${number}-`));
+    const file = exact || (byNumber.length === 1 ? byNumber[0] : null);
+    return file && `/old_chords/${file}`;
+}
+
 function main() {
     const args = process.argv.slice(2);
     const forcePdf = args.includes('--force-pdf');
@@ -102,6 +113,8 @@ function main() {
         }
         const downloads = [`<DownloadsButton pdf="${lyricsPdf}" />`];
         if (chordsPdf) downloads.push(`<DownloadChordsButton pdf="${chordsPdf}"/>`);
+        const original = originalChords(number, slug);
+        if (original) downloads.push(`<DownloadChordsButton pdf="${original}" label="Акорди (оригинал)"/>`);
         writeIfChanged(path.join(DOCS, `${id}.md`), page(number, song, file, downloads));
     }
     if (errors.length) {
