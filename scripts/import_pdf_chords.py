@@ -42,11 +42,11 @@ def norm(ch):
     return ch.upper().translate(LATIN_LOOKALIKES)
 
 
-def rows_of(page):
+def rows_of(page, min_size=13):
     """Group characters into visual rows; small superscript-like glyphs ("m") join the row above."""
     chars = sorted(page.chars, key=lambda c: (round(c["top"]), c["x0"]))
-    big = [c for c in chars if c["size"] >= 13]
-    small = [c for c in chars if c["size"] < 13 and c["text"].strip()]
+    big = [c for c in chars if c["size"] >= min_size]
+    small = [c for c in chars if c["size"] < min_size and c["text"].strip()]
     rows = {}
     for c in big:
         rows.setdefault(round(c["top"]), []).append(c)
@@ -106,42 +106,59 @@ def is_chord_row(row):
     return bool(tokens(row))
 
 
-def pdf_chords(path):
+def pdf_chords(source, verse_numbers=False, min_size=13, keep_order=False):
     """Lyric text of the PDF as one letter stream, and chords anchored to it.
 
+    `source` is a PDF path or a list of pdfplumber pages (or crops of pages).
     Returns (letters, anchors): letters is a list of uppercase letters/digits,
     anchors a list of (chord, index, after) where the chord goes before
-    letters[index], or after it when `after` is true (chord past the line end)."""
+    letters[index], or after it when `after` is true (chord past the line end).
+    With `verse_numbers`, lines may start with a verse number ("1. ") that is
+    not part of the lyrics; otherwise such a line is the song's title. Glyphs
+    smaller than `min_size` are superscripts of the chords ("m"), not lyrics.
+    A second chord on a syllable goes after the word; with `keep_order`, it stays
+    on the syllable ("D/Em") when moving it would put it after a later chord."""
+    if isinstance(source, (str, Path)):
+        with pdfplumber.open(source) as pdf:
+            return pdf_chords(pdf.pages, verse_numbers, min_size, keep_order)
     letters, anchors = [], []
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
-            pending = None
-            for _, row in rows_of(page):
-                if is_chord_row(row):
-                    pending = tokens(row)
-                    continue
-                text = "".join(c["text"] for c in row).strip()
-                # The title row ("119. Ако жадува...") and bare labels ("Пр.:") are not lyrics.
-                if re.match(r"^\d+\.\s", text) or re.fullmatch(LABEL, text):
-                    pending = None
-                    continue
-                line = []  # (char, x0, x1, letter index or None)
-                for c in (c for c in row if c["size"] >= 13):
-                    if LETTER.match(c["text"]):
-                        line.append((c["text"], c["x0"], c["x1"], len(letters)))
-                        letters.append(norm(c["text"]))
-                    else:
-                        line.append((c["text"], c["x0"], c["x1"], None))
-                if pending and any(i is not None for *_, i in line):
-                    used = set()
-                    for chord, x in pending:
-                        idx, after = anchor_at(line, x)
-                        if not after and idx in used:
-                            # A second chord on the same syllable is played after the word.
-                            idx, after = end_of_word(line, idx), True
-                        used.add(idx)
-                        anchors.append((chord.replace("H", "B"), idx, after, text))
+    for page in source:
+        pending = None
+        for _, row in rows_of(page, min_size):
+            if is_chord_row(row):
+                pending = tokens(row)
+                continue
+            text = "".join(c["text"] for c in row).strip()
+            if verse_numbers and not text:
+                continue  # rows of spaces (the hymnal's empty paragraphs) sit between chords and lyrics
+            # The title row ("119. Ако жадува...") and bare labels ("Пр.:") are not lyrics.
+            if (not verse_numbers and re.match(r"^\d+\.\s", text)) or re.fullmatch(LABEL, text):
                 pending = None
+                continue
+            if verse_numbers:
+                number = re.match(r"^\s*\d+\.\s*", "".join(c["text"] for c in row))
+                row = row[len(number.group()):] if number else row
+            line = []  # (char, x0, x1, letter index or None)
+            for c in (c for c in row if c["size"] >= min_size):
+                if LETTER.match(c["text"]):
+                    line.append((c["text"], c["x0"], c["x1"], len(letters)))
+                    letters.append(norm(c["text"]))
+                else:
+                    line.append((c["text"], c["x0"], c["x1"], None))
+            if pending and any(i is not None for *_, i in line):
+                raw = [(chord.replace("H", "B"), *anchor_at(line, x)) for chord, x in pending]
+                placed = []  # [chord, letter index, after]
+                for k, (chord, idx, after) in enumerate(raw):
+                    first = next((p for p in placed if p[1] == idx and not p[2]), None)
+                    if not after and first:
+                        end = end_of_word(line, idx)
+                        if keep_order and any(not a and i <= end for _, i, a in raw[k + 1:]):
+                            first[0] += "/" + chord
+                            continue
+                        idx, after = end, True
+                    placed.append([chord, idx, after])
+                anchors.extend((chord, idx, after, text) for chord, idx, after in placed)
+            pending = None
     return letters, anchors
 
 
@@ -239,7 +256,7 @@ def rebuild(plain, inserts):
             out.append(f"[{chord}]")
         out.append(ch)
     line = "".join(out).rstrip()
-    for _, chord in sorted(after):
+    for _, chord in sorted(after, key=lambda a: a[0]):
         line += f" [{chord}]"
     return line
 
@@ -254,12 +271,15 @@ def original_pdf(number, slug):
     return (exact or pdfs or [None])[0] if len(exact) == 1 or len(pdfs) == 1 else None
 
 
-def process(cho_path, write):
-    number = song_number(cho_path)
-    pdf = original_pdf(number, cho_path.stem[4:])
-    if not pdf:
-        return None
-    letters, anchors = pdf_chords(pdf)
+def process(cho_path, write, pdf=None, pages=None, note=None, min_size=13, keep_order=False):
+    """Places the chords of the song's original PDF (or of `pages`, crops of a
+    larger PDF) into its .cho file; `note` is the editor note written above it."""
+    if pages is None:
+        pdf = pdf or original_pdf(song_number(cho_path), cho_path.stem[4:])
+        if not pdf:
+            return None
+    letters, anchors = pdf_chords(pages if pages is not None else pdf, verse_numbers=pages is not None,
+                                  min_size=min_size, keep_order=keep_order)
     if not anchors:
         return None
     text = cho_path.read_text()
@@ -302,7 +322,7 @@ def process(cho_path, write):
     changes = []
     for li in sorted(covered_lines):
         n, plain, _ = lines[li]
-        new = rebuild(plain, sorted(inserts.get(li, [])))
+        new = rebuild(plain, sorted(inserts.get(li, []), key=lambda ins: ins[0]))
         new_by_text.setdefault(re.sub(r"\s+", " ", plain.strip()), new)
         if new != src[n]:
             changes.append((n, src[n], new))
@@ -317,11 +337,12 @@ def process(cho_path, write):
 
     if write and changes:
         new_text = "\n".join(src)
-        if "static/old_chords" not in new_text.split("\n", 1)[0]:
-            new_text = f"# Акорди: местата са взети от оригиналния PDF static/old_chords/{pdf.name}\n" + new_text
+        note = note or f"# Акорди: местата са взети от оригиналния PDF static/old_chords/{pdf.name}"
+        if note not in new_text.split("\n", 1)[0]:
+            new_text = note + "\n" + new_text
         cho_path.write_text(new_text)
     uncovered = [lines[li][1] for li in range(len(lines)) if li not in covered_lines]
-    return {"pdf": pdf.name, "chords": len(anchors), "lost": lost, "changes": changes, "uncovered": uncovered}
+    return {"pdf": pdf.name if pdf else None, "chords": len(anchors), "lost": lost, "changes": changes, "uncovered": uncovered}
 
 
 def main():
