@@ -13,6 +13,8 @@ songs/NNN-slug.cho ──► docs/NNN.md + src/data/songs/NNN.json   website pag
 ```
 
 On a song page you can show or hide the chords and transpose them; the choice is remembered per browser.
+Short links by number lead to a song's page and files: `/52`, `/pdf/52`, `/chords/52`. Typing a number in
+the search box finds that song.
 
 ## Editing a song
 
