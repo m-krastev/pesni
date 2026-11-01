@@ -67,7 +67,7 @@ If the user asks to transpose, rewrite the chords with the exact mapping (the we
 
 1. Read the existing `songs/NNN-*.cho` first. Treat it as the authoritative source for lyric content, line breaks, stanza breaks, and repeated section layout.
 2. Always read every matching rendered `.png` thumbnail page in `static/chord-thumbnails/` as well; they are required context for every song, not optional.
-3. Read the requested PDF or rendered thumbnail. Use it as the authoritative visual source for chord placement and chord rows.
+3. Read the requested PDF or rendered thumbnail. Use it as the authoritative visual source for chord placement and chord rows. For songs with an original chord PDF in `static/old_chords/`, place chords with `scripts/import_pdf_chords.py NNN` (it reads the exact position of every chord in the PDF; `-v` shows the changes, `--write` applies them; needs `pip install pdfplumber`) instead of estimating positions by eye, then check the lines it reports as not placed.
 4. Do not read or use the matching DOCX files unless the user explicitly asks for DOCX inspection. They are not an allowed source for normal correction work.
 5. Edit that one song by hand.
 6. Preserve the title, section order, lyrics, repeat markers, and source chord intent.
