@@ -7,6 +7,7 @@
 //   static/pdf/N-slug.pdf        printable lyrics
 //   static/chords/N-slug_akord.pdf  printable chord sheet (songs with chords)
 //   static/openlp/*.xml          OpenLyrics for OpenLP, plus pesni-openlp.zip with all songs
+//   static/cho/NNN-slug.cho     the source, for the "Предложи корекция" editor on the page
 //   static/{pdf,chords,}/N/      short links: /pdf/52, /chords/52 and /52 lead to the song's files and page
 //
 // Runs before `npm run build` / `npm start`. A song that does not parse, uses an
@@ -90,9 +91,10 @@ function main() {
         const number = parseInt(file, 10);
         const id = file.slice(0, 3);
         const slug = file.slice(4, -4);
+        const source = fs.readFileSync(path.join(SONGS, file), 'utf8');
         let song;
         try {
-            song = parseSong(fs.readFileSync(path.join(SONGS, file), 'utf8'));
+            song = parseSong(source);
         } catch (e) {
             if (!(e instanceof SongError)) throw e;
             errors.push(`songs/${file}: ${e.message}`);
@@ -103,6 +105,7 @@ function main() {
         modules.push([id, path.basename(modulePath)]);
         if (wanted.size && !wanted.has(number)) continue;
 
+        writeIfChanged(path.join(STATIC, 'cho', file), source);
         writeIfChanged(path.join(DATA, `${id}.json`), JSON.stringify(pageData(number, song)) + '\n');
         changedXml = writeIfChanged(path.join(OPENLP, `${number}-${slug}.xml`), openLyrics(number, song)) || changedXml;
 
