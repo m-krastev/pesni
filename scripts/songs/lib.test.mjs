@@ -94,6 +94,7 @@ test('writes a page that MDX can compile', () => {
     assert.match(md, /^# 7\. ТИ &lt;СИ> #1$/m);
     assert.match(md, /^description: "ПЪРВИ РЕД \/ ВТОРИ РЕД"$/m);
     assert.match(md, /import song from '@site\/src\/data\/songs\/007\.json';/);
+    assert.match(md, /^<SuggestEdit file="007-x\.cho" \/>$/m);
 });
 
 test('formats credits', () => {

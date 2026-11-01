@@ -275,6 +275,8 @@ export function page(number, song, sourceName, downloads) {
         '',
         '<ChordSheet song={song} />',
         ...downloads.flatMap((d) => ['', d]),
+        '',
+        `<SuggestEdit file="${sourceName}" />`,
     ].join('\n') + '\n';
 }
 

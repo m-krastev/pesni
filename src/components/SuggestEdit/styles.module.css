@@ -1,0 +1,91 @@
+.suggest {
+    margin-top: 1.5rem;
+}
+
+.suggest > button {
+    padding-left: 0;
+}
+
+.panel {
+    padding: 1rem;
+    border: 1px solid var(--ifm-color-emphasis-300);
+    border-radius: var(--ifm-global-radius);
+}
+
+.heading {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.help {
+    font-size: 0.85rem;
+    color: var(--ifm-color-emphasis-700);
+}
+
+.source {
+    display: block;
+    width: 100%;
+    font-family: var(--ifm-font-family-monospace);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    padding: 0.5rem;
+    border: 1px solid var(--ifm-color-emphasis-400);
+    border-radius: var(--ifm-global-radius);
+    background: var(--ifm-background-surface-color);
+    color: var(--ifm-font-color-base);
+    resize: vertical;
+}
+
+.preview {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background: var(--ifm-color-emphasis-100);
+    border-radius: var(--ifm-global-radius);
+}
+
+.previewLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ifm-color-emphasis-600);
+    margin-bottom: 0.5rem;
+}
+
+.field {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.field input,
+.field textarea {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    padding: 0.4rem 0.5rem;
+    font: inherit;
+    border: 1px solid var(--ifm-color-emphasis-400);
+    border-radius: var(--ifm-global-radius);
+    background: var(--ifm-background-surface-color);
+    color: var(--ifm-font-color-base);
+}
+
+.trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.error {
+    color: var(--ifm-color-danger);
+    font-weight: 600;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}

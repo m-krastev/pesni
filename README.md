@@ -91,6 +91,35 @@ The workflow needs two repository secrets (Settings → Secrets and variables �
 
 To deploy by hand from a machine with an rclone remote called `propovedi`: `npm run build && npm run deploy`.
 
+## Correction suggestions
+
+Every song page has a "Предложи корекция" button. It opens the song's `.cho` source (copied by the build to
+`/cho/NNN-slug.cho`) in an editor with a live preview, drawn by the same parser as the build, so a broken chord
+or section shows an error before anything is sent. The suggestion goes to
+[`static/api/suggest.php`](static/api/suggest.php), which saves it in a SQLite database outside the web root
+(`~/pesni-suggest-data/suggestions.sqlite`, created on first use). Nothing on the site changes by itself.
+
+Review at <https://pesni.propovedi.org/api/suggestions.php>: each suggestion with its note, a diff against the
+song as the site has it now, and the full proposed file to download. To accept one, put the change into
+`songs/NNN-slug.cho` (or ask Claude to apply suggestion #N), push, and mark it "Приложено".
+
+The review page needs a password. Make a hash of it (`htpasswd` comes with macOS):
+
+```sh
+htpasswd -bnBC 10 "" 'your password' | tr -d ':\n'
+```
+
+and put it in `~/pesni-suggest-config.php` on the server, next to the `pesni.propovedi.org` folder (not inside
+it), for example through the cPanel file manager:
+
+```php
+<?php return ['admin_password_hash' => '$2y$10$...'];
+```
+
+The same file can point the suggestions to MySQL instead of SQLite with `'dsn' => 'mysql:host=localhost;dbname=...'`,
+`'db_user'` and `'db_password'`. Limits against spam: 5 suggestions per hour from one address, 50 per day in all,
+plus a hidden field that bots fill in.
+
 ## Repository layout
 
 | Path | Contents |
@@ -99,7 +128,8 @@ To deploy by hand from a machine with an rclone remote called `propovedi`: `npm 
 | `scripts/build-songs.mjs`, `scripts/songs/` | the song build and its tests |
 | `typ/` | Typst templates for the printed sheets (`style.typ` holds the look) |
 | `src/components/ChordSheet/` | the song view: lyrics, chords, transposition |
+| `src/components/SuggestEdit/`, `static/api/` | the correction editor and its PHP backend |
 | `static/old_chords/`, `static/old_pdf/` | the original chord and lyrics files, kept unchanged |
 
-`docs/`, `src/data/songs/`, `typ/generated/`, `static/pdf/`, `static/chords/` and `static/openlp/` are generated
+`docs/`, `src/data/songs/`, `typ/generated/`, `static/pdf/`, `static/chords/`, `static/cho/` and `static/openlp/` are generated
 and not tracked in git.
