@@ -15,7 +15,7 @@
 
     --ifm-background-color: #fcfbf8;
     --ifm-background-surface-color: #fcfbf8;
-    --ifm-navbar-background-color: rgba(252, 251, 248, 0.92);
+    --ifm-navbar-background-color: rgb(252, 251, 248);
     --ifm-font-color-base: #1d2229;
     --ifm-color-emphasis-300: #dcdad4;
     --site-border: #e6e3dc;
@@ -57,7 +57,7 @@
 
     --ifm-background-color: #15171b;
     --ifm-background-surface-color: #15171b;
-    --ifm-navbar-background-color: rgba(21, 23, 27, 0.92);
+    --ifm-navbar-background-color: rgb(21, 23, 27);
     --ifm-font-color-base: #e4e5e7;
     --ifm-navbar-link-color: #d5d7da;
     --ifm-menu-color: #c9ccd1;
@@ -74,7 +74,6 @@
 
 .navbar {
     border-bottom: 1px solid var(--site-border);
-    backdrop-filter: saturate(1.4) blur(8px);
 }
 
 .navbar__logo {
