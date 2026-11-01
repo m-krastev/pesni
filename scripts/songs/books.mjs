@@ -8,6 +8,7 @@
 //   route     URL prefix ('' = the site root)
 //   intro     optional text for the book's index page
 //   links     optional extra entries for the index page and sidebar: [{label, href}]
+//   groupBy   optional: group the sidebar in collapsed categories of this many songs
 export const BOOKS = [
     {
         id: 'pesni',
@@ -24,13 +25,22 @@ export const BOOKS = [
         route: 'pesni-rozhdestvo',
         intro: 'Рождествени песни от по-новите и от Песнарката.',
         links: [
-            {label: '313. НАМ СЕ РОДИ ЕДНО ДЕТЕ', href: 'https://propovedi.org/pesnarka/313'},
-            {label: '314. ТИХА НОЩ', href: 'https://propovedi.org/pesnarka/314'},
-            {label: '315. О, ЧУДНА, СЛАВНА, СВЯТА НОЩ', href: 'https://propovedi.org/pesnarka/315'},
-            {label: '316. СЛАВА ВО ВИШНИХ', href: 'https://propovedi.org/pesnarka/316'},
-            {label: '318. ЧУЙТЕ АНГЕЛСКИЯ ГЛАС', href: 'https://propovedi.org/pesnarka/318'},
-            {label: '594. ЕДНА ЗВЕЗДА В ПРОСТОРА СВЕТИ', href: 'https://propovedi.org/pesnarka/594'},
+            {label: '313. НАМ СЕ РОДИ ЕДНО ДЕТЕ', href: '/pesnarka/313/'},
+            {label: '314. ТИХА НОЩ', href: '/pesnarka/314/'},
+            {label: '315. О, ЧУДНА, СЛАВНА, СВЯТА НОЩ', href: '/pesnarka/315/'},
+            {label: '316. СЛАВА ВО ВИШНИХ', href: '/pesnarka/316/'},
+            {label: '318. ЧУЙТЕ АНГЕЛСКИЯ ГЛАС', href: '/pesnarka/318/'},
+            {label: '594. ЕДНА ЗВЕЗДА В ПРОСТОРА СВЕТИ', href: '/pesnarka/594/'},
         ],
+    },
+    {
+        id: 'pesnarka',
+        label: 'Песнарка',
+        songs: 'books/pesnarka',
+        docs: 'docs-pesnarka',
+        route: 'pesnarka',
+        intro: 'Духовни песни: текст, мелодия, едноглас и ноти; акорди има над първия куплет на част от песните.',
+        groupBy: 100,
     },
 ];
 

@@ -5,6 +5,7 @@ import MDXComponents from '@theme-original/MDXComponents';
 import {DownloadsButton, DownloadChordsButton} from '@site/src/components/DownloadsButton';
 import ChordSheet from '@site/src/components/ChordSheet';
 import SuggestEdit from '@site/src/components/SuggestEdit';
+import SongMedia from '@site/src/components/SongMedia';
 
 export default {
   // Re-use the default mapping
@@ -13,6 +14,7 @@ export default {
   DownloadChordsButton,
   ChordSheet,
   SuggestEdit,
+  SongMedia,
   // Map the "highlight" tag to our <Highlight /> component!
   // `Highlight` will receive all props that were passed to `highlight` in MDX
 //   chords: Chords,

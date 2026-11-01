@@ -90,11 +90,6 @@ const config = {
                         position: 'right',
                     },
                     {
-                        href: 'https://propovedi.org/pesnarka/',
-                        label: 'Песнарка',
-                        position: 'right',
-                    },
-                    {
                         href: 'https://github.com/m-krastev/pesni',
                         position: 'right',
                         className: 'header-github-link',

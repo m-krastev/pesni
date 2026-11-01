@@ -117,10 +117,24 @@ function sidebar(book, songs, paths) {
         }
         return {songs: ranges};
     }
+    let items = songs.map((s) => paths.docId(s.number));
+    if (book.groupBy) {
+        const groups = [];
+        for (let lo = 1; lo <= Math.max(...songs.map((s) => s.number)); lo += book.groupBy) {
+            const hi = lo + book.groupBy - 1;
+            groups.push({
+                type: 'category',
+                label: `${lo}-${hi}`,
+                items: songs.filter((s) => s.number >= lo && s.number <= hi).map((s) => paths.docId(s.number)),
+                collapsed: true,
+            });
+        }
+        items = groups;
+    }
     return {
         songs: [
             'index',
-            ...songs.map((s) => paths.docId(s.number)),
+            ...items,
             ...(book.links || []).map(({label, href}) => ({type: 'link', label, href})),
         ],
     };

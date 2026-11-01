@@ -1,0 +1,13 @@
+# Песнарка moved to https://pesni.propovedi.org/pesnarka/. This file goes to the old site's
+# folder on the server, public_html/pesnarka/.htaccess (the old pages stay there untouched).
+RewriteEngine On
+Options -MultiViews
+
+# Recordings and scores live on hopeforthebalkans.org (the same rule as in public_html/.htaccess,
+# which a subfolder's own rewrite rules would otherwise switch off).
+RewriteRule ^(mp3|transp|scores)/(.*)$ https://hopeforthebalkans.org/static/$1/$2 [R=301,L,NC]
+
+# Hymn pages, search and everything else.
+RewriteRule ^([0-9]+)/?$ https://pesni.propovedi.org/pesnarka/$1/ [R=301,L]
+RewriteRule ^search/?$ https://pesni.propovedi.org/search [R=301,L,QSA]
+RewriteRule ^ https://pesni.propovedi.org/pesnarka/ [R=301,L]

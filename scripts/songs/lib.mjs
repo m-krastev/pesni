@@ -7,7 +7,7 @@ const {ChordProParser, Chord} = chordsheet;
 // Metadata directives a song may use. `original` and `translator` are written
 // `{meta: original Shine, Jesus, Shine}` / `{meta: translator ...}`.
 export const META_FIELDS = ['title', 'artist', 'composer', 'lyricist', 'copyright', 'key', 'tempo', 'time',
-    'capo', 'ccli', 'original', 'translator'];
+    'capo', 'ccli', 'original', 'translator', 'reference', 'scripture', 'melody', 'unison', 'score'];
 const BARS_ONLY = /^[\s|:.]*$/;
 
 export class SongError extends Error {}
@@ -111,6 +111,8 @@ export function credits(meta) {
     const authors = [meta.artist, meta.lyricist, meta.composer].filter(Boolean);
     if (authors.length) parts.push([...new Set(authors)].join(', '));
     if (meta.translator) parts.push(`Превод: ${meta.translator}`);
+    if (meta.reference) parts.push(meta.reference);
+    if (meta.scripture) parts.push(meta.scripture);
     return parts.join(' · ');
 }
 
@@ -274,6 +276,10 @@ export function page(number, song, {source, data, suggest, downloads = []}) {
         `# ${number}. ${mdxText(song.title)}`,
         '',
         '<ChordSheet song={song} />',
+        ...(song.meta.melody || song.meta.unison || song.meta.score
+            ? ['', `<SongMedia${['melody', 'unison', 'score'].filter((k) => song.meta[k])
+                .map((k) => ` ${k}=${JSON.stringify(song.meta[k])}`).join('')} />`]
+            : []),
         ...downloads.flatMap((d) => ['', d]),
         '',
         `<SuggestEdit file="${suggest}" />`,

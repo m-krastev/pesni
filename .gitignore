@@ -33,5 +33,6 @@ archive
 /docs-*/
 /src/data/sidebars/
 /src/data/rozhdestvo/
+/src/data/pesnarka/
 /static/*/pdf/
 /static/*/chords/
