@@ -17,6 +17,7 @@ export const BOOKS = [
         songs: 'songs',
         docs: 'docs',
         route: '',
+        intro: 'Съвременни песни за хваление и поклонение, с акорди и транспониране.',
     },
     {
         id: 'rozhdestvo',
@@ -24,15 +25,7 @@ export const BOOKS = [
         songs: 'books/rozhdestvo',
         docs: 'docs-rozhdestvo',
         route: 'pesni-rozhdestvo',
-        intro: 'Рождествени песни от по-новите и от Песнарката.',
-        links: [
-            {label: '313. НАМ СЕ РОДИ ЕДНО ДЕТЕ', href: '/pesnarka/313/'},
-            {label: '314. ТИХА НОЩ', href: '/pesnarka/314/'},
-            {label: '315. О, ЧУДНА, СЛАВНА, СВЯТА НОЩ', href: '/pesnarka/315/'},
-            {label: '316. СЛАВА ВО ВИШНИХ', href: '/pesnarka/316/'},
-            {label: '318. ЧУЙТЕ АНГЕЛСКИЯ ГЛАС', href: '/pesnarka/318/'},
-            {label: '594. ЕДНА ЗВЕЗДА В ПРОСТОРА СВЕТИ', href: '/pesnarka/594/'},
-        ],
+        intro: 'Рождествени песни: по-новите (1-14) и тези от Песнарката (313-594).',
     },
     {
         id: 'pesnarka',
@@ -40,7 +33,7 @@ export const BOOKS = [
         songs: 'books/pesnarka',
         docs: 'docs-pesnarka',
         route: 'pesnarka',
-        intro: 'Духовни песни: текст, мелодия, едноглас и ноти; акорди има над първия куплет на част от песните.',
+        intro: 'Духовните песни: текст, мелодия, едноглас и ноти, а на част от тях и акорди.',
         groupBy: 100,
     },
     {
@@ -49,7 +42,7 @@ export const BOOKS = [
         songs: 'books/new',
         docs: 'docs-new',
         route: 'new',
-        intro: 'Песни от spodelenohvalenie.com (без тези, които са в Песни и Песнарка). Всяка песен има връзка към източника.',
+        intro: 'Песни от сайта „Споделено хваление“, които ги няма в Песни и Песнарка, с връзка към източника.',
         groupBy: 'letter',
     },
 ];
