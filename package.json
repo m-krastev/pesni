@@ -7,7 +7,7 @@
     "songs": "node scripts/build-songs.mjs",
     "test": "node --test --disable-warning=MODULE_TYPELESS_PACKAGE_JSON \"scripts/**/*.test.mjs\" \"src/**/*.test.mjs\"",
     "prestart": "npm run songs",
-    "start": "docusaurus start",
+    "start": "NODE_OPTIONS=--max-old-space-size=8192 docusaurus start",
     "prebuild": "npm run songs",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",

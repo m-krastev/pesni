@@ -1,54 +1,76 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
+import {useHistory} from '@docusaurus/router';
 import books from '@site/src/data/books.json';
 import styles from './index.module.css';
 
-const HOME = {pesni: '/1-50/'};
+// Песни starts with its first range of 50; the other books with their index page.
+const bookHome = (book) => (book.route ? `/${book.route}/` : '/1-50/');
+const songUrl = (book, number) => (book.route ? `/${book.route}/${number}/` : `/${String(number).padStart(3, '0')}/`);
 
-// Opens the search box in the navbar.
-function openSearch() {
-    const input = document.querySelector('.navbar__search-input');
-    if (input) input.focus();
-    else document.querySelector('.navbar__search button, [aria-label="Search"]')?.click();
+// Opens a song by its number in the chosen book.
+function OpenByNumber() {
+    const history = useHistory();
+    const [bookId, setBookId] = useState(books[0].id);
+    const [number, setNumber] = useState('');
+    const [missing, setMissing] = useState(false);
+    const book = books.find((b) => b.id === bookId);
+    const open = (event) => {
+        event.preventDefault();
+        const n = parseInt(number, 10);
+        if (book.numbers.includes(n)) history.push(songUrl(book, n));
+        else setMissing(true);
+    };
+    return (
+        <form className={styles.open} onSubmit={open}>
+            <label htmlFor="song-number">Песен №</label>
+            <input id="song-number" type="number" inputMode="numeric" min="1" value={number} autoFocus
+                onChange={(e) => {
+                    setNumber(e.target.value);
+                    setMissing(false);
+                }} />
+            <select aria-label="Сборник" value={bookId} onChange={(e) => {
+                setBookId(e.target.value);
+                setMissing(false);
+            }}>
+                {books.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
+            </select>
+            <button type="submit">Отвори</button>
+            {missing && <span className={styles.missing}>В {book.label} няма песен {number}.</span>}
+        </form>
+    );
 }
 
 export default function Home() {
-    const total = books.reduce((sum, book) => sum + book.count, 0);
     return (
-        <Layout title="Песни за хваление и поклонение" description="Християнски песни с текст, акорди, ноти и записи.">
+        <Layout title="Песни" description="Християнски песни за хваление и поклонение: текст, акорди, ноти и записи.">
             <main className={styles.home}>
-                <header className={styles.hero}>
-                    <h1>Песни за хваление и поклонение</h1>
-                    <p>{total.toLocaleString('bg')} песни с текст и акорди: за пеене в църква, за подготовка на хваление и за прожектиране в OpenLP.</p>
-                    <button type="button" className={styles.search} onClick={openSearch}>
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3m0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10" /></svg>
-                        Търсене по заглавие или текст
-                    </button>
-                </header>
-                <section className={styles.books} aria-label="Сборници">
-                    {books.map((book) => (
-                        <Link key={book.id} to={HOME[book.id] || `/${book.route}/`} className={styles.book}>
-                            <span className={styles.count}>{book.count}</span>
-                            <h2>{book.label}</h2>
-                            <p>{book.intro}</p>
-                        </Link>
-                    ))}
-                </section>
-                <section className={styles.notes}>
-                    <div>
-                        <h3>Акорди</h3>
-                        <p>Включете ги от менюто „Акорди“ на песента. Там песента се транспонира, а „Схеми“ показва как се хваща всеки акорд.</p>
-                    </div>
-                    <div>
-                        <h3>Отпечатване и OpenLP</h3>
-                        <p>Всяка песен има PDF с текста и с акордите. Всички песни за OpenLP: <a href="/openlp/pesni-openlp.zip">Песни</a>, <a href="/openlp/rozhdestvo-openlp.zip">Рождество</a>, <a href="/openlp/pesnarka-openlp.zip">Песнарка</a>, <a href="/openlp/new-openlp.zip">Нови</a>.</p>
-                    </div>
-                    <div>
-                        <h3>Поправки</h3>
-                        <p>Видите ли грешка в текста или акордите, натиснете „Предложи корекция“ под песента.</p>
-                    </div>
-                </section>
+                <h1>Песни за хваление и поклонение</h1>
+                <OpenByNumber />
+                <table className={styles.books}>
+                    <thead>
+                        <tr>
+                            <th>Сборник</th>
+                            <th className={styles.count}>Песни</th>
+                            <th>Съдържание</th>
+                            <th>OpenLP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {books.map((book) => (
+                            <tr key={book.id}>
+                                <th scope="row"><Link to={bookHome(book)}>{book.label}</Link></th>
+                                <td className={styles.count}>{book.count}</td>
+                                <td>{book.intro}</td>
+                                <td><a href={book.zip} download>zip</a></td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <p className={styles.footnote}>
+                    Акордите, транспонирането и схемите са в менюто над всяка песен. Грешка в песен? „Предложи корекция“ е под нея.
+                </p>
             </main>
         </Layout>
     );

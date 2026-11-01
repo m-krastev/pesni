@@ -273,6 +273,8 @@ export function page(number, song, {source, data, suggest, downloads = []}) {
         '---',
         `# Generated from ${source} by scripts/build-songs.mjs: edit the .cho file, not this page.`,
         `description: ${yamlString(description)}`,
+        // No table of contents: without it Docusaurus gives the song the column's full width.
+        'hide_table_of_contents: true',
         '---',
         '',
         `import song from '${data}';`,

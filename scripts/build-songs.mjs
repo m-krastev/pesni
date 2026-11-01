@@ -227,7 +227,7 @@ function buildBook(book, {wanted, forcePdf, typst, errors}) {
         execFileSync('zip', ['-q', '-X', '-j', zip, ...fs.readdirSync(xmlDir).filter((f) => f.endsWith('.xml')).sort()
             .map((f) => path.join(xmlDir, f))]);
     }
-    return {count: files.length, rendered};
+    return {count: files.length, rendered, numbers: songs.map((song) => song.number)};
 }
 
 function main() {
@@ -242,7 +242,8 @@ function main() {
     // The books with their song counts, for the home page (src/pages/index.js).
     writeIfChanged(path.join(ROOT, 'src', 'data', 'books.json'), JSON.stringify(results.map(([book, r]) => ({
         id: book.id, label: book.label, route: book.route, intro: book.intro || '', count: r.count,
-    })), null, 1) + '\n');
+        zip: '/' + path.relative(STATIC, path.join(ROOT, bookPaths(book).zip)).split(path.sep).join('/'), numbers: r.numbers,
+    }))) + '\n');
     // Where each book's pages live, for the suggestion review page (static/api/suggestions.php).
     writeIfChanged(path.join(STATIC, 'cho', 'books.json'),
         JSON.stringify(Object.fromEntries(BOOKS.map((book) => [bookPaths(book).cho.replace(/\/$/, ''), book.route]))) + '\n');
