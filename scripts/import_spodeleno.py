@@ -129,7 +129,7 @@ def convert(song, known):
     out.append("")
 
     seen = {}
-    for name, content in sections_of(song["text"]):
+    for name, content in sections_of(song["text"].replace("\r", "")):
         lines = []
         for piece in re.split(r"(\{Акорди\}.*?\{/Акорди\})", content, flags=re.S):
             block = re.fullmatch(r"\{Акорди\}(.*?)\{/Акорди\}", piece, flags=re.S)
