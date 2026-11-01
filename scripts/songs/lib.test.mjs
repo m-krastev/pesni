@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {SongError, credits, isChord, openLyrics, page, parseSong, redirectPage, typModule} from './lib.mjs';
+import {SongError, credits, isChord, isChordOnly, openLyrics, page, parseSong, redirectPage, typModule, typText} from './lib.mjs';
 
 const SONGS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../songs');
 
@@ -118,3 +118,17 @@ test('writes redirect pages for short links', () => {
     assert.match(html, /location\.replace\("\/pdf\/1-mir-kato-reka\.pdf"\)/);
 });
 
+
+test('escapes Typst markup at the start of a line', () => {
+    assert.equal(typText('/'), '\\/');
+    assert.equal(typText('/ 2'), '\\/ 2');
+    assert.equal(typText('- ДА'), '\\- ДА');
+    assert.equal(typText('1. ДА'), '1\\. ДА');
+});
+
+test('chord rows may end in repeat marks', () => {
+    const rows = parseSong('{title: T}\n{start_of_verse}\n||: [Am] | [F] :|| x2\n| [G] / / [D] | (2x)\n[Am]Текст x2\n{end_of_verse}\n').sections[0].lines;
+    assert.equal(isChordOnly(rows[0]), true);
+    assert.equal(isChordOnly(rows[1]), true);
+    assert.equal(isChordOnly(rows[2]), false);
+});

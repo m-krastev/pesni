@@ -77,8 +77,9 @@ const mdText = (text) => text.replace(/[{}<>[\]*_`\\]/g, (c) => `\\${c}`);
 
 // Index page of a book other than Песни: its songs and extra links, at the book's root URL.
 function indexPage(book, songs, paths) {
+    const listed = book.groupBy === 'letter' ? [...songs].sort(byTitle) : songs;
     const entries = [
-        ...songs.map(({number, title}) => `- [${number}. ${mdText(title)}](${paths.pageUrl(number)})`),
+        ...listed.map(({number, title}) => `- [${number}. ${mdText(title)}](${paths.pageUrl(number)})`),
         ...(book.links || []).map(({label, href}) => `- [${mdText(label)}](${href})`),
     ];
     return [
@@ -97,6 +98,10 @@ function indexPage(book, songs, paths) {
         '',
     ].join('\n');
 }
+
+const collator = new Intl.Collator('bg', {sensitivity: 'base', numeric: true});
+const byTitle = (a, b) => collator.compare(a.title.replace(/^[^\p{L}\d]+/u, ''), b.title.replace(/^[^\p{L}\d]+/u, ''));
+const initial = (title) => (title.replace(/^[^\p{L}\d]+/u, '')[0] || '#').toLocaleUpperCase('bg');
 
 // Песни keeps its sidebar of fixed ranges (and their old URLs: the home page is
 // the first range). Other books list their songs, then the extra links.
@@ -118,7 +123,15 @@ function sidebar(book, songs, paths) {
         return {songs: ranges};
     }
     let items = songs.map((s) => paths.docId(s.number));
-    if (book.groupBy) {
+    if (book.groupBy === 'letter') {
+        const letters = new Map();
+        for (const song of [...songs].sort(byTitle)) {
+            const letter = initial(song.title);
+            if (!letters.has(letter)) letters.set(letter, []);
+            letters.get(letter).push(paths.docId(song.number));
+        }
+        items = [...letters].map(([letter, ids]) => ({type: 'category', label: letter, items: ids, collapsed: true}));
+    } else if (book.groupBy) {
         const groups = [];
         for (let lo = 1; lo <= Math.max(...songs.map((s) => s.number)); lo += book.groupBy) {
             const hi = lo + book.groupBy - 1;

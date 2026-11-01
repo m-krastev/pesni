@@ -25,6 +25,7 @@ The site has one tab per songbook, listed in [`scripts/songs/books.mjs`](scripts
 | Песни | `songs/` | `/052/` |
 | Рождество | `books/rozhdestvo/` (the originals are kept in `static/pesni-rozhdestvo/`) | `/pesni-rozhdestvo/1/` |
 | Песнарка | `books/pesnarka/` (imported once from the old hymnal site with `scripts/import_pesnarka.py`) | `/pesnarka/313/` |
+| Нови | `books/new/` (imported once from spodelenohvalenie.com with `scripts/import_spodeleno.py`) | `/new/52/` |
 
 Each book is its own Docusaurus docs instance with a generated sidebar and its own search index: the search box
 searches the book you are in (from Песни it searches every book), and the search page can switch between them.
@@ -38,6 +39,11 @@ are on hopeforthebalkans.org. Chords (from "Духовни песни" with chor
 The old address propovedi.org/pesnarka/ redirects here with
 [`scripts/redirects/pesnarka.htaccess`](scripts/redirects/pesnarka.htaccess), copied by hand to
 `public_html/pesnarka/.htaccess` on the server.
+
+Нови has the spodelenohvalenie.com songs that are not already in Песни or Песнарка, numbered in the order the site
+lists them (the scrape in `spodeleno/`, made with `scripts/scrape_spodeleno.py`). Each page links to its source
+(`{meta: source ...}`) and video (`{meta: youtube ...}`). The site's author credits are mostly wrong, so they are kept
+only as `#` notes. Chords come from the site's chord progressions and chord files.
 
 `static/.htaccess` replaces the site's `.htaccess` on the server: it keeps cPanel's lines and turns on
 compression (the search index of all books is 5 MB of JSON, about 1 MB compressed).

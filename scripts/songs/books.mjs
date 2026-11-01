@@ -8,7 +8,8 @@
 //   route     URL prefix ('' = the site root)
 //   intro     optional text for the book's index page
 //   links     optional extra entries for the index page and sidebar: [{label, href}]
-//   groupBy   optional: group the sidebar in collapsed categories of this many songs
+//   groupBy   optional: group the sidebar in collapsed categories of this many songs, or by first
+//             letter of the title ('letter', which also sorts the index page by title)
 export const BOOKS = [
     {
         id: 'pesni',
@@ -41,6 +42,15 @@ export const BOOKS = [
         route: 'pesnarka',
         intro: 'Духовни песни: текст, мелодия, едноглас и ноти; акорди има над първия куплет на част от песните.',
         groupBy: 100,
+    },
+    {
+        id: 'new',
+        label: 'Нови',
+        songs: 'books/new',
+        docs: 'docs-new',
+        route: 'new',
+        intro: 'Песни от spodelenohvalenie.com (без тези, които са в Песни и Песнарка). Всяка песен има връзка към източника.',
+        groupBy: 'letter',
     },
 ];
 

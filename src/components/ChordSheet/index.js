@@ -34,7 +34,9 @@ function firstChordOf(song) {
 }
 
 // Chord rows (an intro, `||: [F#m] | [D] :||`) carry no lyrics and are hidden without chords.
-const isChordOnly = (line) => Array.isArray(line) && /^[\s|:.]*$/.test(line.map(([, text]) => text).join(''));
+// (The same rule as BARS_ONLY in scripts/songs/lib.mjs.)
+const BARS_ONLY = /^(?:[\s|:./%()]|[xх×]\s*\d+|\d+\s*[xх×])*$/iu;
+const isChordOnly = (line) => Array.isArray(line) && BARS_ONLY.test(line.map(([, text]) => text).join(''));
 
 // Groups a line into words: each word keeps the chords that sit inside or at the
 // start of it, so the browser can wrap between words without a chord drifting

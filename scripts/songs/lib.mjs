@@ -7,8 +7,9 @@ const {ChordProParser, Chord} = chordsheet;
 // Metadata directives a song may use. `original` and `translator` are written
 // `{meta: original Shine, Jesus, Shine}` / `{meta: translator ...}`.
 export const META_FIELDS = ['title', 'artist', 'composer', 'lyricist', 'copyright', 'key', 'tempo', 'time',
-    'capo', 'ccli', 'original', 'translator', 'reference', 'scripture', 'melody', 'unison', 'score'];
-const BARS_ONLY = /^[\s|:.]*$/;
+    'capo', 'ccli', 'original', 'translator', 'reference', 'scripture', 'melody', 'unison', 'score', 'source', 'youtube'];
+// What a chord row may hold besides chords: bar lines, "/" for the same chord again and repeat marks ("x2", "(2x)").
+export const BARS_ONLY = /^(?:[\s|:./%()]|[xх×]\s*\d+|\d+\s*[xх×])*$/iu;
 
 export class SongError extends Error {}
 
@@ -126,7 +127,7 @@ export function lyricLines(song) {
 
 export function typText(text) {
     let out = text.replace(/[\\#*_`$@<>\[\]~]/g, (c) => `\\${c}`).replace(/\/(?=[/*])/g, '\\/');
-    out = out.replace(/^([-+=]|\/ )/, '\\$1').replace(/^(\d+)\.(\s)/, '$1\\.$2');
+    out = out.replace(/^([-+=]|\/(?=\s|$))/, '\\$1').replace(/^(\d+)\.(\s)/, '$1\\.$2');
     return out;
 }
 
@@ -262,6 +263,9 @@ ${verses.join('\n')}
 const yamlString = (s) => JSON.stringify(s);
 const mdxText = (text) => text.replace(/[{}]/g, (c) => `\\${c}`).replace(/</g, '&lt;');
 
+// Recordings, score and links shown under the lyrics by <SongMedia>.
+const MEDIA = ['melody', 'unison', 'score', 'youtube', 'source'];
+
 /** The song page. `source` is the .cho path, `data` the import path of its pageData JSON. */
 export function page(number, song, {source, data, suggest, downloads = []}) {
     const description = lyricLines(song).slice(0, 2).join(' / ');
@@ -276,8 +280,8 @@ export function page(number, song, {source, data, suggest, downloads = []}) {
         `# ${number}. ${mdxText(song.title)}`,
         '',
         '<ChordSheet song={song} />',
-        ...(song.meta.melody || song.meta.unison || song.meta.score
-            ? ['', `<SongMedia${['melody', 'unison', 'score'].filter((k) => song.meta[k])
+        ...(MEDIA.some((k) => song.meta[k])
+            ? ['', `<SongMedia${MEDIA.filter((k) => song.meta[k])
                 .map((k) => ` ${k}=${JSON.stringify(song.meta[k])}`).join('')} />`]
             : []),
         ...downloads.flatMap((d) => ['', d]),

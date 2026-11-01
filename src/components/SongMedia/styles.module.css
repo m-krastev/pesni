@@ -35,3 +35,10 @@
     margin-top: 0.5rem;
     background: #fff;
 }
+
+.links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    font-size: 0.9rem;
+}
