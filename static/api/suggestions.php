@@ -44,7 +44,7 @@ if ($loggedIn && isset($_GET['download'])) {
     $suggestion = $row->fetch();
     if ($suggestion) {
         header('Content-Type: text/plain; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $suggestion['song'] . '"');
+        header('Content-Disposition: attachment; filename="' . basename($suggestion['song']) . '"');
         echo $suggestion['text'];
         exit;
     }
@@ -140,11 +140,10 @@ form { display: inline; } button { font: inherit; margin-right: .5rem; }
 <p><?= $all ? '<a href="?">Само новите</a>' : '<a href="?all">Всички, и прегледаните</a>' ?> · <?= count($rows) ?> предложения</p>
 <?php if (!$rows): ?><p>Няма нови предложения.</p><?php endif; ?>
 <?php foreach ($rows as $s):
-    $number = (int) $s['song'];
     $current = currentSource($s['song']);
 ?>
 <article>
-  <h2><a href="/<?= h(substr($s['song'], 0, 3)) ?>/" target="_blank"><?= $number ?>. <?= h($s['song']) ?></a> · #<?= (int) $s['id'] ?> · <?= h($labels[$s['status']] ?? $s['status']) ?></h2>
+  <h2><a href="<?= h(songUrl($s['song'])) ?>" target="_blank"><?= h($s['song']) ?></a> · #<?= (int) $s['id'] ?> · <?= h($labels[$s['status']] ?? $s['status']) ?></h2>
   <div class="meta"><?= h($s['created_at']) ?> UTC · <?= $s['name'] !== '' ? h($s['name']) : 'без име' ?></div>
   <?php if ($s['note'] !== ''): ?><blockquote><?= h($s['note']) ?></blockquote><?php endif; ?>
   <?php if ((int) $s['outdated']): ?><p class="warn">Направено върху по-стара версия на песента: внимавайте да не върнете по-нови поправки.</p><?php endif; ?>

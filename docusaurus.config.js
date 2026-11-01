@@ -4,6 +4,7 @@
 const {themes} = require('prism-react-renderer');
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
+const {BOOKS} = require('./scripts/songs/books.mjs');
 
 
 /** @type {import('@docusaurus/types').Config} */
@@ -69,18 +70,20 @@ const config = {
                 {name: "keywords", content: "християнски, песни, хваление, поклонение, бог, библия, християнство, християни, акорди, музика, текст, текст на песни, текстове, евангелски песни"}
             ],
             navbar: {
-                title: 'Песни',
+                // No site title: the first tab (Песни) already leads home.
                 // logo: {
                 //   alt: 'My Site Logo',
                 //   src: 'img/logo.svg',
                 // },
                 items: [
-                    //   {
-                    //     type: 'doc',
-                    //     docId: 'intro',
-                    //     position: 'left',
-                    //     label: 'Песни',
-                    //   },
+                    // One tab per songbook (scripts/songs/books.mjs).
+                    ...BOOKS.map((book) => ({
+                        type: 'docSidebar',
+                        sidebarId: 'songs',
+                        docsPluginId: book.id === 'pesni' ? undefined : book.id,
+                        label: book.label,
+                        position: 'left',
+                    })),
                     {
                         href: 'https://propovedi.org/',
                         label: 'ProPoVedi',
@@ -150,6 +153,16 @@ const config = {
             },
         }),
     plugins: [
+        // Every songbook except Песни (the preset's docs) is its own docs instance.
+        ...BOOKS.filter((book) => book.id !== 'pesni').map((book) => [
+            '@docusaurus/plugin-content-docs',
+            {
+                id: book.id,
+                path: book.docs,
+                routeBasePath: book.route,
+                sidebarPath: require.resolve(`./src/data/sidebars/${book.id}.json`),
+            },
+        ]),
         // [
             // require.resolve("@cmfcmf/docusaurus-search-local"),
             // {
@@ -254,7 +267,11 @@ const config = {
               // ... Your options.
               // `hashed` is recommended as long-term-cache of index file is possible.
               indexBlog:false,
-              docsRouteBasePath: '/',
+              docsRouteBasePath: BOOKS.map((book) => book.route || '/'),
+              docsDir: BOOKS.map((book) => book.docs),
+              // One search index per book; the search page can still search them all.
+              searchContextByPaths: BOOKS.filter((book) => book.route).map((book) => ({label: book.label, path: book.route})),
+              useAllContextsWithNoSearchContext: true,
               hashed: true,
               // Russian for the Cyrillic tokenizer (there is no Bulgarian); English for original titles.
               language: ["ru", "en"],

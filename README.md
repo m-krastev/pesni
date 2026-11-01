@@ -16,6 +16,21 @@ On a song page you can show or hide the chords and transpose them; the choice is
 Short links by number lead to a song's page and files: `/52`, `/pdf/52`, `/chords/52`. Typing a number in
 the search box finds that song.
 
+## Songbooks
+
+The site has one tab per songbook, listed in [`scripts/songs/books.mjs`](scripts/songs/books.mjs):
+
+| Tab | Songs | Address |
+|-----|-------|---------|
+| Песни | `songs/` | `/052/` |
+| Рождество | `books/rozhdestvo/` (the originals are kept in `static/pesni-rozhdestvo/`) | `/pesni-rozhdestvo/1/` |
+
+Each book is its own Docusaurus docs instance with a generated sidebar and its own search index: the search box
+searches the book you are in (from Песни it searches every book), and the search page can switch between them.
+Песни keeps the paths it always had; the other books get theirs under their address (`/pesni-rozhdestvo/pdf/...`,
+`static/openlp/rozhdestvo/`, `rozhdestvo-openlp.zip`). A new book is a folder of `.cho` files and an entry in
+`books.mjs`.
+
 ## Editing a song
 
 A song looks like this:
@@ -125,11 +140,13 @@ plus a hidden field that bots fill in.
 | Path | Contents |
 |------|----------|
 | `songs/` | the songs (ChordPro), the source of truth |
+| `books/` | the other songbooks, one folder each |
 | `scripts/build-songs.mjs`, `scripts/songs/` | the song build and its tests |
 | `typ/` | Typst templates for the printed sheets (`style.typ` holds the look) |
 | `src/components/ChordSheet/` | the song view: lyrics, chords, transposition |
 | `src/components/SuggestEdit/`, `static/api/` | the correction editor and its PHP backend |
 | `static/old_chords/`, `static/old_pdf/` | the original chord and lyrics files, kept unchanged |
 
-`docs/`, `src/data/songs/`, `typ/generated/`, `static/pdf/`, `static/chords/`, `static/cho/` and `static/openlp/` are generated
+`docs/`, `docs-*/`, `src/data/songs/`, `src/data/<book>/`, `src/data/sidebars/`, `typ/generated/`, `static/pdf/`,
+`static/chords/`, `static/<book address>/pdf/` and `chords/`, `static/cho/` and `static/openlp/` are generated
 and not tracked in git.

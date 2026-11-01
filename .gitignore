@@ -30,3 +30,8 @@ archive
 /static/cho/
 /.deployed/
 /static/[0-9]*/
+/docs-*/
+/src/data/sidebars/
+/src/data/rozhdestvo/
+/static/*/pdf/
+/static/*/chords/

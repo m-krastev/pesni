@@ -90,7 +90,8 @@ test('writes OpenLyrics with verse order, chords and credits', () => {
 
 test('writes a page that MDX can compile', () => {
     const song = parseSong('{title: ТИ <СИ> #1}\n{start_of_verse}\nПЪРВИ РЕД\nВТОРИ РЕД\n{end_of_verse}\n');
-    const md = page(7, song, '007-x.cho', ['<DownloadsButton pdf="/pdf/7-x.pdf" />']);
+    const md = page(7, song, {source: 'songs/007-x.cho', data: '@site/src/data/songs/007.json', suggest: '007-x.cho',
+        downloads: ['<DownloadsButton pdf="/pdf/7-x.pdf" />']});
     assert.match(md, /^# 7\. ТИ &lt;СИ> #1$/m);
     assert.match(md, /^description: "ПЪРВИ РЕД \/ ВТОРИ РЕД"$/m);
     assert.match(md, /import song from '@site\/src\/data\/songs\/007\.json';/);

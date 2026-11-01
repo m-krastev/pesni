@@ -173,11 +173,11 @@ function typBody(song, withChords) {
 }
 
 /** A Typst module exporting `song` (chord sheet), `lyrics` (lyrics only) and `info`. */
-export function typModule(number, song, sourceName) {
+export function typModule(number, song, source, style = '../style.typ') {
     const info = credits(song.meta);
     return [
-        `// Generated from songs/${sourceName} by scripts/build-songs.mjs: edit the .cho file.`,
-        '#import "../style.typ": chorus, song-info',
+        `// Generated from ${source} by scripts/build-songs.mjs: edit the .cho file.`,
+        `#import "${style}": chorus, song-info`,
         `#let title = [= ${number}. ${typText(song.title)}]`,
         `#let info = ${info ? `song-info[${typText(info)}]` : '[]'}`,
         `#let copyright = ${song.meta.copyright ? `song-info[${typText(song.meta.copyright)}]` : '[]'}`,
@@ -204,7 +204,7 @@ function verseType(section) {
     return 'o';
 }
 
-export function openLyrics(number, song) {
+export function openLyrics(number, song, songbook = 'Песни') {
     const names = new Map();
     const counters = {};
     const verses = [];
@@ -245,7 +245,7 @@ export function openLyrics(number, song) {
 ${meta.original ? `      <title lang="en">${xml(meta.original)}</title>\n` : ''}    </titles>
 ${authors.length ? `    <authors>\n${[...new Set(authors)].join('\n')}\n    </authors>\n` : ''}${optional('copyright', meta.copyright)}${optional('ccliNo', meta.ccli)}${optional('key', meta.key)}    <verseOrder>${order.join(' ')}</verseOrder>
     <songbooks>
-      <songbook name="Песни" entry="${number}"/>
+      <songbook name="${xml(songbook)}" entry="${number}"/>
     </songbooks>
   </properties>
   <lyrics>
@@ -260,29 +260,28 @@ ${verses.join('\n')}
 const yamlString = (s) => JSON.stringify(s);
 const mdxText = (text) => text.replace(/[{}]/g, (c) => `\\${c}`).replace(/</g, '&lt;');
 
-export function page(number, song, sourceName, downloads) {
-    const id = String(number).padStart(3, '0');
+/** The song page. `source` is the .cho path, `data` the import path of its pageData JSON. */
+export function page(number, song, {source, data, suggest, downloads = []}) {
     const description = lyricLines(song).slice(0, 2).join(' / ');
     return [
         '---',
-        `# Generated from songs/${sourceName} by scripts/build-songs.mjs: edit the .cho file, not this page.`,
+        `# Generated from ${source} by scripts/build-songs.mjs: edit the .cho file, not this page.`,
         `description: ${yamlString(description)}`,
         '---',
         '',
-        `import song from '@site/src/data/songs/${id}.json';`,
+        `import song from '${data}';`,
         '',
         `# ${number}. ${mdxText(song.title)}`,
         '',
         '<ChordSheet song={song} />',
         ...downloads.flatMap((d) => ['', d]),
         '',
-        `<SuggestEdit file="${sourceName}" />`,
+        `<SuggestEdit file="${suggest}" />`,
     ].join('\n') + '\n';
 }
 
 /** What the <ChordSheet> component gets. */
-export function pageData(number, song) {
-    const id = String(number).padStart(3, '0');
+export function pageData(number, song, id = String(number).padStart(3, '0')) {
     return {id, credits: credits(song.meta), copyright: song.meta.copyright || '', sections: song.sections};
 }
 
