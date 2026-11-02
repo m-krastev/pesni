@@ -70,7 +70,7 @@
     transition: background 0.12s, color 0.12s;
 }
 
-.tool:hover {
+.tool:hover:not(:disabled) {
     background: var(--ifm-menu-color-background-hover);
     color: var(--ifm-color-primary);
 }
@@ -78,6 +78,12 @@
 .tool:focus-visible {
     outline: 2px solid var(--ifm-color-primary);
     outline-offset: 1px;
+}
+
+.tool:disabled,
+.off {
+    opacity: 0.35;
+    cursor: default;
 }
 
 .tool[aria-pressed='true'] {
