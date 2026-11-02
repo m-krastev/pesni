@@ -47,6 +47,8 @@ jobs:
           name: site
           path: build
           retention-days: 7
+          # build/.htaccess (compression) is a hidden file.
+          include-hidden-files: true
 
   deploy:
     needs: build
@@ -84,7 +86,9 @@ jobs:
           RCLONE_CONFIG_PROPOVEDI_NO_CHECK_CERTIFICATE: "true"
         run: bash scripts/deploy.sh
 
+      # Also after a failed upload: .deployed then has the files that did arrive.
       - uses: actions/cache/save@v6
+        if: always()
         with:
           path: .deployed
           key: deployed-${{ github.run_id }}

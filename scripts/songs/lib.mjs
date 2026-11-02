@@ -269,9 +269,15 @@ const MEDIA = ['melody', 'unison', 'score', 'youtube', 'source'];
 /** The song page. `source` is the .cho path, `data` the import path of its pageData JSON. */
 export function page(number, song, {source, data, suggest, downloads = []}) {
     const description = lyricLines(song).slice(0, 2).join(' / ');
+    const label = `${number}. ${song.title}`;
     return [
         '---',
         `# Generated from ${source} by scripts/build-songs.mjs: edit the .cho file, not this page.`,
+        // The browser and search result title says what is on the page, as people search for it;
+        // the sidebar and the previous/next links show the number.
+        `title: ${yamlString(`${song.title} – текст${hasChords(song) ? ' и акорди' : ''}`)}`,
+        `sidebar_label: ${yamlString(label)}`,
+        `pagination_label: ${yamlString(label)}`,
         `description: ${yamlString(description)}`,
         // No table of contents: without it Docusaurus gives the song the column's full width.
         'hide_table_of_contents: true',
