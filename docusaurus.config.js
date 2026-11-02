@@ -153,6 +153,23 @@ const config = {
             },
         }),
     plugins: [
+        // The webpack runtime keeps its name (runtime~main.js) instead of a content hash. It lists
+        // the hashes of all page chunks, so with a hashed name any song edit changed every page
+        // and the deploy uploaded all of them. The server has browsers revalidate it (.htaccess).
+        () => ({
+            name: 'stable-runtime-name',
+            configureWebpack(config, isServer) {
+                if (isServer) return {};
+                const hashed = config.output.filename;
+                return {
+                    output: {
+                        filename: (data) => (data.chunk && data.chunk.name === 'runtime~main'
+                            ? 'assets/js/runtime~main.js'
+                            : typeof hashed === 'function' ? hashed(data) : hashed),
+                    },
+                };
+            },
+        }),
         // Every songbook except Песни (the preset's docs) is its own docs instance.
         ...BOOKS.filter((book) => book.id !== 'pesni').map((book) => [
             '@docusaurus/plugin-content-docs',
