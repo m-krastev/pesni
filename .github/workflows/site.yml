@@ -47,6 +47,8 @@ jobs:
           name: site
           path: build
           retention-days: 7
+          # build/.htaccess (compression) is a hidden file.
+          include-hidden-files: true
 
   deploy:
     needs: build
