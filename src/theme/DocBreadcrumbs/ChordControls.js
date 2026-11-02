@@ -18,33 +18,29 @@ export default function ChordControls() {
                 </svg>
                 <span className={styles.toolLabel}>Акорди</span>
             </button>
-            {show && (
-                <>
-                    <span className={styles.divider} />
-                    <button type="button" className={styles.tool} onClick={() => transposeBy(-1)}
-                        title="Половин тон надолу" aria-label="Транспонирай половин тон надолу">−</button>
-                    <span className={styles.key} title={semitones ? `Тоналност (${semitones > 0 ? '+' : ''}${semitones})` : 'Тоналност'}>
-                        {key}
-                        {semitones !== 0 && <sup>{semitones > 0 ? `+${semitones}` : semitones}</sup>}
-                    </span>
-                    <button type="button" className={styles.tool} onClick={() => transposeBy(1)}
-                        title="Половин тон нагоре" aria-label="Транспонирай половин тон нагоре">+</button>
-                    {semitones !== 0 && (
-                        <button type="button" className={styles.tool} onClick={() => transposeBy(0)}
-                            title="Оригиналната тоналност" aria-label="Оригиналната тоналност">↺</button>
-                    )}
-                    <span className={styles.divider} />
-                    <button type="button" className={styles.tool} onClick={toggleDiagrams} aria-pressed={diagrams}
-                        title={diagrams ? 'Скрий схемите' : 'Покажи схемите на акордите'}>
-                        <svg viewBox="0 0 24 24" className={styles.icon} aria-hidden="true">
-                            <path d="M5 3h14v2H5zm0 2h2v16H5zm4 0h2v16H9zm4 0h2v16h-2zm4 0h2v16h-2zM5 9h14v1.5H5zm0 5h14v1.5H5z" />
-                            <circle cx="10" cy="12" r="2.2" />
-                            <circle cx="14" cy="7" r="2.2" />
-                        </svg>
-                        <span className={styles.toolLabel}>Схеми</span>
-                    </button>
-                </>
-            )}
+            {/* Always all there, so no button moves: without chords the rest is greyed out. */}
+            <span className={styles.divider} />
+            <button type="button" className={styles.tool} onClick={() => transposeBy(-1)} disabled={!show}
+                title="Половин тон надолу" aria-label="Транспонирай половин тон надолу">−</button>
+            <span className={`${styles.key} ${show ? '' : styles.off}`}
+                title={semitones ? `Тоналност (${semitones > 0 ? '+' : ''}${semitones})` : 'Тоналност'}>
+                {key}
+                {semitones !== 0 && <sup>{semitones > 0 ? `+${semitones}` : semitones}</sup>}
+            </span>
+            <button type="button" className={styles.tool} onClick={() => transposeBy(1)} disabled={!show}
+                title="Половин тон нагоре" aria-label="Транспонирай половин тон нагоре">+</button>
+            <button type="button" className={styles.tool} onClick={() => transposeBy(0)} disabled={!show || semitones === 0}
+                title="Оригиналната тоналност" aria-label="Оригиналната тоналност">↺</button>
+            <span className={styles.divider} />
+            <button type="button" className={styles.tool} onClick={toggleDiagrams} aria-pressed={show && diagrams}
+                disabled={!show} title={diagrams ? 'Скрий схемите' : 'Покажи схемите на акордите'}>
+                <svg viewBox="0 0 24 24" className={styles.icon} aria-hidden="true">
+                    <path d="M5 3h14v2H5zm0 2h2v16H5zm4 0h2v16H9zm4 0h2v16h-2zm4 0h2v16h-2zM5 9h14v1.5H5zm0 5h14v1.5H5z" />
+                    <circle cx="10" cy="12" r="2.2" />
+                    <circle cx="14" cy="7" r="2.2" />
+                </svg>
+                <span className={styles.toolLabel}>Схеми</span>
+            </button>
         </div>
     );
 }

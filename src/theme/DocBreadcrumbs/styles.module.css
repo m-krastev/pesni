@@ -18,11 +18,14 @@
     margin-bottom: 0;
 }
 
+/* The menus go on a second line when the screen is too narrow for both. */
 .menus {
     display: flex;
-    flex: none;
+    flex: 1 1 auto;
     flex-wrap: wrap;
+    justify-content: flex-end;
     gap: 0.5rem;
+    min-width: 0;
     margin-left: auto;
 }
 
@@ -34,6 +37,7 @@
 
     .menus {
         margin-left: 0;
+        justify-content: flex-start;
     }
 }
 
@@ -70,14 +74,23 @@
     transition: background 0.12s, color 0.12s;
 }
 
-.tool:hover {
-    background: var(--ifm-menu-color-background-hover);
-    color: var(--ifm-color-primary);
+/* Only with a mouse: on phones the hover look stays after a tap and hid the pressed state. */
+@media (hover: hover) {
+    .tool:hover:not(:disabled):not([aria-pressed='true']) {
+        background: var(--ifm-menu-color-background-hover);
+        color: var(--ifm-color-primary);
+    }
 }
 
 .tool:focus-visible {
     outline: 2px solid var(--ifm-color-primary);
     outline-offset: 1px;
+}
+
+.tool:disabled,
+.off {
+    opacity: 0.35;
+    cursor: default;
 }
 
 .tool[aria-pressed='true'] {
