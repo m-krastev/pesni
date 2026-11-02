@@ -44,7 +44,7 @@ function OpenByNumber() {
 
 export default function Home() {
     return (
-        <Layout title="Песни" description="Християнски песни за хваление и поклонение: текст, акорди, ноти и записи.">
+        <Layout title="Текстове и акорди" description="Християнски песни за хваление и поклонение: текст, акорди, ноти и записи.">
             <main className={styles.home}>
                 <h1>Песни за хваление и поклонение</h1>
                 <OpenByNumber />

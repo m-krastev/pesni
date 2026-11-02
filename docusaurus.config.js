@@ -9,10 +9,14 @@ const {BOOKS} = require('./scripts/songs/books.mjs');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-    title: 'Песни',
+    // The end of every page title ("Мир като река – текст и акорди | Християнски песни").
+    title: 'Християнски песни',
     tagline: 'Християнски песни за хваление и поклонение',
     url: 'https://pesni.propovedi.org',
     baseUrl: '/',
+    // Pages are folders (/new/1/index.html): links, canonical URLs and the sitemap
+    // end in "/", so they are the address the server answers at, not a redirect.
+    trailingSlash: true,
     onBrokenLinks: 'throw',
     markdown: {
         hooks: {onBrokenMarkdownLinks: 'warn'},
