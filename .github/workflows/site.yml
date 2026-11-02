@@ -84,7 +84,9 @@ jobs:
           RCLONE_CONFIG_PROPOVEDI_NO_CHECK_CERTIFICATE: "true"
         run: bash scripts/deploy.sh
 
+      # Also after a failed upload: .deployed then has the files that did arrive.
       - uses: actions/cache/save@v6
+        if: always()
         with:
           path: .deployed
           key: deployed-${{ github.run_id }}
